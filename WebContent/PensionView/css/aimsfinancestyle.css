@@ -1,0 +1,127 @@
+body
+{
+	FONT-WEIGHT:normal;
+	FONT-FAMILY:Arial, Helvetica, sans-serif;
+	background-color:#f8f8ff; 
+	margin-left: 0px;
+	margin-top: 0px;
+	background-attachment: fixed;
+	text-align: center;
+}
+
+.screentitle
+{
+	Color: #000000;
+	Text-Align: center;
+	Font-Family: Arial, Verdana, Helvetica, sans-serif;
+    Font-Size: 11pt;
+    Font-Weight: bold;
+    Text-Decoration: none
+}
+.tboddrow
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: center;
+    background-color:#BFB4D8;
+}
+.tbevenrow
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: center;
+    background-color:#DCD7EA;
+}
+.tdleft
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    text-align: right;
+    background-color:#DCD7EA;
+}
+.tdright
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    background-color:#ECE9F3;
+}
+.tbheader
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    color:white;
+    background-color:#8771B7;
+}
+.tbheadingelemts
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    color:white;
+    text-align: center;
+    background-color:#8771B7;
+}
+.tbfooter
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    text-align: center;
+    background-color:#8771B7;
+  
+}
+.screenfooter
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: normal;
+    FONT-SIZE: 5pt;
+    text-align: center;
+    background-color:#8771B7; 
+}
+.normaltext
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: center;
+}
+.displaydata
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+	FONT-SIZE: 12px;
+    color:green;
+    text-align: center;
+}
+.tbnumericdata
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: right;
+}
+.tbtextdata
+{
+	text-align: left;
+}
+
+.Data{
+	Color: #000000; 
+	Text-Decoration: none; 
+	Font-Family: Helvetica; 
+	Font-Size: 9pt; 
+	Font-Weight: none 
+}
+
+.Lable{
+	Color: #000080; 
+	Font-Family: Helvetica; 
+	Font-Size: 8pt; 
+	Font-Weight: bold; 
+}
+

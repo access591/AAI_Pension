@@ -1,0 +1,41 @@
+ 
+
+.displaytable {
+	border: 1px solid #666;
+	width: 70%;
+	margin: 10px 0 20px 0 !important;
+	font:12px;
+	background-color: #CBD9E3;
+}
+.displaytabletreven{
+	background-color: #FFFFFF;
+	text-align:center;
+}
+.displaytabletrodd{
+	background-color: #EEF4FD;
+	text-align:center;
+}
+th.sorted a,th.sortable a {
+	background-position: right;
+	display: block;
+	width: 100%;
+}
+
+
+th.sortable a {
+	background-image: url(../images/arrow_off.png);
+    background-repeat: no-repeat;
+}
+
+th.order1 a {
+	background-image: url(../images/arrow_down.png);
+    background-repeat: no-repeat;
+}
+
+th.order2 a {
+	background-image: url(../images/arrow_up.png);
+    background-repeat: no-repeat;
+}
+
+
+

@@ -1,0 +1,131 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	background-color: #FFFFFF;
+}
+.TextBold {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	font-weight:bold;
+}
+.footer {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #FFFFFF;
+	height:24px;
+	background-color: #000066;
+}
+.BodyContentMagins {
+	padding: 0px 0 20px 0;
+	background-image:url(../images/innerbg.jpg);
+	background-repeat: no-repeat;
+	background-position:top;
+}
+.text {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color:#FFFFFF;
+	line-height: 20px;
+}
+.TxtField {
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:11px;
+	border:1px solid #000;
+	background-color:#FFFFFF;
+	width:190px;
+	height:28px;
+	padding:6px;
+} 
+.BodyContent{
+	padding: 0px 0 20px 0;
+	background-image:url(../images/bodybg.gif);
+	background-repeat:repeat-x;
+} 
+.NITlogo {
+	background-image:url(../images/nit.gif);
+	background-repeat:no-repeat;
+	background-position: 53px 360px;
+}
+.MenuPadding {
+	padding-top: 50px;
+}
+.MainBt1 {
+	font: bold 12px Arial, Helvetica, sans-serif;
+	color:#993399;
+}
+.MainBt2 {
+	font: bold 12px Arial, Helvetica, sans-serif;
+	color:#9D5A0B;
+}
+.MainBt3 {
+	font: bold 12px Arial, Helvetica, sans-serif;
+	color:#003399;
+}
+.MainBt4 {
+	font: bold 12px Arial, Helvetica, sans-serif;
+	color:#336600;
+}
+.MainBt5 {
+	font: bold 12px Arial, Helvetica, sans-serif;
+	color:#003399;
+}
+
+A.Link1 {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color:#000;
+	text-decoration:none;
+}
+A.Link1:hover {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color: #5B0088;
+	text-decoration:none;
+}
+A.Link2 {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color:#000;
+	text-decoration:none;
+}
+A.Link2:hover {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color: #5E3F00;
+	text-decoration:none;
+}
+A.Link3 {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color:#FFF;
+	text-decoration:none;
+}
+A.Link3:hover {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color: #33CCFF;
+	text-decoration:none;
+}
+A.Link4 {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color:#000;
+	text-decoration:none;
+}
+A.Link4:hover {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color: #006600;
+	text-decoration:none;
+}
+A.Link5 {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color:#000;
+	text-decoration:none;
+}
+A.Link5:hover {
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color: #000099;
+	text-decoration:none;
+}
+.dots {
+	background-image: url(../images/dots.gif);
+	background-repeat: repeat-x;
+	background-position: top;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}

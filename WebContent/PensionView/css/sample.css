@@ -1,0 +1,129 @@
+body
+{
+	FONT-WEIGHT:normal;
+	FONT-FAMILY:Arial, Helvetica, sans-serif;
+	background-color:#f8f8ff; 
+	margin-left: 0px;
+	margin-top: 0px;
+	background-attachment: fixed;
+	text-align: center;
+}
+
+.screentitle
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 14pt;
+    text-align: center;
+}
+.tboddrow
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: center;
+    background-color:#BFB4D8;
+}
+.tbevenrow
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: center;
+    background-color:#DCD7EA;
+}
+.tdleft
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    text-align: right;
+    background-color:#DCD7EA;
+}
+.tdright
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    background-color:#6699CC;
+}
+.tbheader
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    color:white;
+    background-color:#8771B7;
+}
+.tbheadingelemts
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    color:white;
+    text-align: center;
+    background-color:#8771B7;
+}
+.tbfooter
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    text-align: center;
+    background-color:#8771B7;
+  
+}
+.screenfooter
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: normal;
+    FONT-SIZE: 5pt;
+    text-align: center;
+    background-color:#8771B7; 
+}
+.normaltext
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: center;
+}
+.displaydata
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+	FONT-SIZE: 12px;
+    color:green;
+    text-align: center;
+}
+.tbnumericdata
+{
+	font-family:Arial, Helvetica, sans-serif;
+	FONT-WEIGHT: bold;
+    FONT-SIZE: 9pt;
+    text-align: right;
+}
+.tbtextdata
+{
+	text-align: left;
+}
+
+input.btn{
+  
+   float: left;	
+ 	color: #444;
+	width: auto; 
+   font-family:'trebuchet ms',helvetica,sans-serif;
+   font-size:84%;
+   font-weight:bold;
+   background-color:#E1E2E3;
+   position: relative;
+   border:1px solid;
+   margin-right: 6px;
+   text-decoration: none;
+   padding-right: 18px; /* sliding doors padding */
+   border-top-color:#666666;
+   border-left-color:#666666;
+   border-right-color:#666666;
+   border-bottom-color:#666666;
+}
