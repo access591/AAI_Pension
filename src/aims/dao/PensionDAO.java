@@ -4511,9 +4511,9 @@ public class PensionDAO {
 			}
 			String sql = "select * from employee_unit_master where region='"
 					+ region + "' " + condition + " order by unitname";
-			log.info("sql " + sql);
+			log.info("sql ===========" + sql);
 			rs = st.executeQuery(sql);
-			log.info("sql " + sql);
+			log.info("sql ===========" + sql);
 			while (rs.next()) {
 				bean = new EmpMasterBean();
 				unitName = (String) rs.getString("unitname").toString().trim();

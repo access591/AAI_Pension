@@ -42,7 +42,9 @@ public class DBUtils {
 					.getBundle("aims.resource.DbProperties");
 			String driverClassName = bundle.getString("oracle.drivers");
 			String url = bundle.getString("oracle.access.url");
+			log.info("====url "+ url);
 			String username = bundle.getString("oracle.access.user");
+			log.info("====username " + username);
 			String pwd = bundle.getString("oracle.access.password");
 
 			Class.forName(driverClassName.trim());

@@ -65,6 +65,7 @@ public class SearchPensionMasterServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		log.info("Search Pension Master Servlet . java ");
 		PensionService ps = new PensionService();
 		FinancialService fs = new FinancialService();
 		AdjCrtnService adjCrtnService = new AdjCrtnService();
@@ -696,6 +697,7 @@ public class SearchPensionMasterServlet extends HttpServlet {
 		
 		finReportService.editSettlementInfo(pfid,seperationdate, intrestcalcfinaldate, interestcalcDate, resettlementdate ,reintrestcalcdate,userId,recoverieTable,clientname,remarks,seperationreason,oldintrestcacfinaldate,oldresettlementdate,oldintrestcalcdate);
 		String message="Data saved Successfully";
+		
 		request.setAttribute("msg", message);
 		 RequestDispatcher rd = request
 			.getRequestDispatcher("./search1?method=employeesearch");

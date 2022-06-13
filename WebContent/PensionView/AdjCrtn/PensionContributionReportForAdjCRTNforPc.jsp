@@ -6,11 +6,17 @@
 <%@ page import="aims.bean.*"%>
 <%@ page import="aims.dao.*"%>
 <%@ page import="aims.action.cashbook.Employee" %>
+<%@page import="org.apache.log4j.Logger"%>
 <%
+
+	Logger log = Logger.getLogger(request.getRequestURI());
+	
 	String path = request.getContextPath();
+	log.info("====PensionContributionReportForAdjCrtnforPc : path " + path);
 	String basePath = request.getScheme() + "://"
 			+ request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
+			log.info("basePath=====" + basePath);
 	ArrayList a = new ArrayList();
 	String color = "yellow";
 	String noofMonths="",arrearFlag="";
@@ -37,7 +43,9 @@
 	double cpfOpeningBalance = 0.0, penOpeningBalance = 0.0, pfOpeningBalance = 0.0, empSubOpeningBalance = 0.0, aaiContriOpeningBalance =0.0; 
 	double percentage = 0.0,advanceAmt =0.00, pfwSubAmt =0.00,pfwContriAmt = 0.00, subTotal=0.00,empSubscri=0.00,aaiContri = 0.00,pf = 0.00,cumempSubscri = 0.00, cumAAiContri=0.00, aaiContriTot =0.00,  empSubscriTot=0.00;
 	double  grandEmpSub =0.00,grandEmpSubInterest =0.00,grandAAIContri=0.00,grandAAIContriInterest=0.00;
+	
 	if (request.getAttribute("reportType") != null) {
+		log.info("report type === NULL")
 		reportType = (String) request.getAttribute("reportType");
 		if (reportType.equals("Excel Sheet")
 				|| reportType.equals("ExcelSheet")) {
@@ -52,37 +60,54 @@
 	String cntFlag = "";
 	int size = 0;
 	size = PensionContributionList.size();
+	log.info("PensionContributionList ==== " + size);
 	for (int i = 0; i < PensionContributionList.size(); i++) {
+		
+		log.info("For block ");
 		PensionContBean contr = (PensionContBean) PensionContributionList
 				.get(i);
 		employeeNm = contr.getEmployeeNM();
+		log.info("employee Name : " + employeeNm);
 		pensionNo = contr.getPensionNo();
+		log.info("Pension Number : " + pensionNo);
 		empSerialNo = contr.getEmpSerialNo();
+		log.info("empSerialNo : " + empSerialNo);
 		doj = contr.getEmpDOJ();
 		dob = contr.getEmpDOB();
 		cpfacno = StringUtility.replaces(
 				contr.getCpfacno().toCharArray(), ",=".toCharArray(),
 				",").toString();
-
+				log.info("CpfacNo  : " + cpfacno);
 		if (cpfacno.indexOf(",=") != -1) {
+			
 			cpfacno = cpfacno.substring(1, cpfacno.indexOf(",="));
+			log.info(1 : " + cpfacno);
 		} else if (cpfacno.indexOf(",") != -1) {
 			cpfacno = cpfacno.substring(cpfacno.indexOf(",") + 1,
 					cpfacno.length());
+					log.info("2 : " + cpfacno);
 		}
 		whetherOption = contr.getWhetherOption();
+		log.info("whetherOption : " + whetherOption);
 		if (whetherOption.toUpperCase().trim().equals("A")) {
 			fullWthrOptionDesc = "Full Pay";
+			log.info("full day")
 		} else if (whetherOption.toUpperCase().trim().equals("B")
 				|| whetherOption.toUpperCase().trim().equals("NO")) {
 			fullWthrOptionDesc = "Ceiling Pay";
+			log.info("ceiling pay : ");
 		} else {
 			fullWthrOptionDesc = whetherOption;
+			log.info("else block : ");
 		}
 		employeeNO = contr.getEmployeeNO();
+		log.info("employee number : " + employeeNO);
 		designation = contr.getDesignation();
+		log.info("designation : " + designation);
 		fhName = contr.getFhName();
+		log.info("fhName : " + fhName);
 		gender = contr.getGender();
+		log.info("gender : " + gender);
 		region1 = contr.getEmpRegion();
 		cpfaccno1 = contr.getEmpCpfaccno();
 	    

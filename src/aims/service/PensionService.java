@@ -343,8 +343,11 @@ public class PensionService {
 			int insertPensionOptionRevisedPfids = fileName
 					.indexOf("EPIS_PERSONAL_OPTION_REVISED");
 			int importCpfData = fileName.indexOf("IMP_CALC_UPD-");
+			System.out.println("1");
 			try {
+				System.out.println("2");
 				if (insertNomineeDtls != -1) {
+					System.out.println("3");
 					readData = common.readExcelSheet(fileName);
 					IDAO.insertNomineeDtls(readData);
 					String fileName1 = fileName.substring(fileName
@@ -352,12 +355,14 @@ public class PensionService {
 					lengths = fileName1 + " " + "Sheet Imported SuccessFully";
 				}
 				if (finalSettlement != -1) {
+					System.out.println("4");
 					readData = common.readExcelSheet(fileName);
 					IDAO.readXLSFinalSettlement(readData);
 					String fileName1 = fileName.substring(fileName
 							.lastIndexOf("\\") + 1, fileName.length());
 					lengths = fileName1 + " " + "Sheet Imported SuccessFully";
 				} else if (createEmpUtilizeOldPFIDS != -1) {
+					System.out.println("5");
 					readData = common.readExcelSheet(fileName);
 					IDAO.createEmpUtilzeOldPfid(readData, region, userName,
 							ipAddress);
@@ -366,13 +371,16 @@ public class PensionService {
 					lengths = fileName1 + " " + "Sheet Imported SuccessFully";
 				}
 				if (fileName.indexOf(".mdb") != -1) {
+					System.out.println("6");
 					pensionDAO.readACCESSData(fileName);
 				} else if (updateMasterNametoTransaction != -1) {
+					System.out.println("7");
 					readData = common.readExcelSheet(fileName);
 					IDAO.updateMasterNmtoTrans(readData);
 					lengths = "Data Imported SuccessFully";
 
 				} else if (pensionCalculation != -1) {
+					System.out.println("8");
 					readData = common.readExcelSheet(fileName);
 					IDAO.pensionCalculation(readData);
 					lengths = "PensionCalculation updated SuccessFully";
@@ -382,6 +390,7 @@ public class PensionService {
 						|| importCHQIADOB0809Count != -1
 						|| importCHQIADTVROB0809Count != -1
 						|| importCHQIADOBCAP0809Count != -1) {
+					System.out.println("9");
 					readData = common.readExcelSheet(fileName);
 					String fileName1 = fileName.substring(fileName
 							.lastIndexOf("\\") + 1, fileName.length());
@@ -389,6 +398,7 @@ public class PensionService {
 							ipAddress, fileName1, year, month, airportcode);
 					lengths = fileName1 + " " + "Sheet Imported SuccessFully";
 				} else if (importAdjOpeningBalance != -1) {
+					System.out.println("10");
 					log.info("PensionService::importAdjOpeningBalance");
 					Map mutliplesheets = new HashMap();
 					String shtidslist = "", pfidslist = "";
@@ -403,10 +413,12 @@ public class PensionService {
 					String fileName1 = "", files = "";
 					int i = 0;
 					while (itr.hasNext()) {
+						System.out.println("11");
 						Map.Entry entry = (Map.Entry) itr.next();
 						i = i + 1;
 						log.info("Sheet kkkkkkkkkkkkkkkk" + entry.getKey() + i);
 						if (entry.getKey().equals("AAIEPF2_REC")) {
+							System.out.println("12");
 							fileName = entry.getValue().toString();
 							readData = common.readExcelSheet(fileName);
 							fileName1 = fileName
@@ -425,6 +437,7 @@ public class PensionService {
 								files = files + " , " + fileName1;
 							}
 
+							System.out.println("13");
 							form2filename = (String) outputList.get(0);
 							shtidslist = (String) outputList.get(1);
 							adjUploadDAO
@@ -435,6 +448,7 @@ public class PensionService {
 											bundle
 													.getString("upload.folder.path.slashsuffix"));
 						} else {
+							System.out.println("14");
 							adjUploadDAO
 									.uploadsheetsintoDB(
 											entry.getValue().toString(),
@@ -448,6 +462,7 @@ public class PensionService {
 
 					lengths = files + " " + "Sheet Imported SuccessFully";
 				} else if (importAdjOpeningBalanceLoad != -1) {
+					System.out.println("15");
 					log.info("PensionService::importAdjOpeningBalance");
 					Map mutliplesheets = new HashMap();
 					String shtidslist = "", pfidslist = "";
@@ -462,6 +477,7 @@ public class PensionService {
 					String fileName1 = "", files = "";
 					int i = 0;
 					while (itr.hasNext()) {
+						System.out.println("16");
 						Map.Entry entry = (Map.Entry) itr.next();
 						i = i + 1;
 						log.info("Sheet kkkkkkkkkkkkkkkk" + entry.getKey() + i);
@@ -494,6 +510,7 @@ public class PensionService {
 											bundle
 													.getString("upload.folder.path.slashsuffix"));
 						} else {
+							System.out.println("17");
 							adjUploadDAO
 									.uploadsheetsintoDB(
 											entry.getValue().toString(),
@@ -509,6 +526,7 @@ public class PensionService {
 				} else if (importEastArr9697Count != -1
 						|| importKolIADArr9697Count != -1
 						|| importNorthArr9697Count != -1) {
+					System.out.println("18");
 					readData = common.readExcelSheet(fileName);
 					int length = readData.length();
 					// IDAO.importEastArr9697(readData);
@@ -516,13 +534,16 @@ public class PensionService {
 					// IDAO.importChqnadArr9697(readData);
 					lengths = "Data Inserted SuccessFully";
 				} else if (importIadArr9697Count != -1) {
+					System.out.println("19");
 					readData = common.readExcelSheet(fileName);
 					int length = readData.length();
 					IDAO.importIADArr9697(readData);
 					lengths = "Data Inserted SuccessFully";
 				} else if (importMonthwiseSupplData != -1) {
 					log.info("inside importMonthwiseSupplData");
+					System.out.println("20");
 					try {
+						System.out.println("21");
 						readData = common.readExcelSheet(fileName);
 						String fileName1 = fileName
 								.substring(
@@ -542,12 +563,15 @@ public class PensionService {
 								+ "Sheet Imported SuccessFully."
 								+ " Total Inserted Records - " + message;
 					} catch (InvalidDataException ex) {
+						System.out.println("22");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (importMonthwiseArrData != -1) {
+					System.out.println("23");
 					log.info("inside importMonthwiseArrData");
 					try {
+						System.out.println("24");
 						readData = common.readExcelSheet(fileName);
 						String fileName1 = fileName
 								.substring(
@@ -567,12 +591,15 @@ public class PensionService {
 								+ "Sheet Imported SuccessFully."
 								+ " Total Inserted Records - " + message;
 					} catch (InvalidDataException ex) {
+						System.out.println("25");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (importMonthwiseaaiepf4Data != -1) {
+					System.out.println("26");
 					log.info("inside importMonthwiseaaiepf4Data");
 					try {
+						System.out.println("27");
 						readData = common.readExcelSheet(fileName);
 						String fileName1 = fileName
 								.substring(
@@ -592,12 +619,15 @@ public class PensionService {
 								+ "Sheet Imported SuccessFully."
 								+ " Total Inserted Records - " + message;
 					} catch (InvalidDataException ex) {
+						System.out.println("28");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (importMonthwisesinglesuppliData != -1) {
+					System.out.println("29");
 					log.info("inside importMonthwisesinglesuppliData");
 					try {
+						System.out.println("30");
 						readData = common.readExcelSheet(fileName);
 						String fileName1 = fileName.substring(fileName
 								.lastIndexOf("\\") + 1, fileName.length());
@@ -609,13 +639,17 @@ public class PensionService {
 								+ "Sheet Imported SuccessFully."
 								+ " Total Inserted Records - " + message;
 					} catch (InvalidDataException ex) {
+						System.out.println("31");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (importMonthwiseTRData != -1) {
+					System.out.println("32");
 					log.info("inside importMonthwiseTRData");
 					try {
+						System.out.println("32");
 						readData = common.readExcelSheet(fileName);
+						log.info("fileName ===> " + fileName );
 						String fileName1 = fileName
 								.substring(
 										fileName
@@ -632,12 +666,15 @@ public class PensionService {
 														.getString("upload.folder.path.slashsuffix")));
 						lengths =  message;
 					} catch (InvalidDataException ex) {
+						System.out.println("33");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (pentionContributionProcess != -1) {
+					System.out.println("34");
 					readData = common.readExcelSheet(fileName);
 					try {
+						System.out.println("35");
 						String fileName1 = fileName.substring(fileName
 								.lastIndexOf("\\") + 1, fileName.length());
 						IDAO.pentionContributionProcess(readData, region,
@@ -647,13 +684,16 @@ public class PensionService {
 								+ "Sheet Imported SuccessFully."
 								+ " Total Inserted Records - ";
 					} catch (Exception ex) {
+						System.out.println("36");
 						log.info("In Service" + ex.getMessage());
 
 					}
 				} else if (cpfRecievedFromOtherOrg != -1) {
+					System.out.println("37");
 					log.info("cpfRecievedFromOtherOrg ");
 					readData = common.readExcelSheet(fileName);
 					try {
+						System.out.println("38");
 						String fileName1 = fileName.substring(fileName
 								.lastIndexOf("\\") + 1, fileName.length());
 						String message = IDAO.cpfRecievedFromOtherOrg(readData,
@@ -667,12 +707,15 @@ public class PensionService {
 								+ "Sheet Imported SuccessFully."
 								+ " Total Inserted Records - " + message;
 					} catch (InvalidDataException ex) {
+						System.out.println("39");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (advancePfwFinalsettlement != -1) {
+					System.out.println("40");
 					readData = common.readExcelSheet(fileName);
 					try {
+						System.out.println("41");
 						String fileName1 = fileName.substring(fileName
 								.lastIndexOf("\\") + 1, fileName.length());
 						IDAO.advancePfwFinalsettlement(readData, region,
@@ -682,12 +725,14 @@ public class PensionService {
 						lengths = fileName1 + " "
 								+ "Sheet Imported SuccessFully.";
 					} catch (InvalidDataException ex) {
+						System.out.println("42");
 						log.info("In Service" + ex.getMessage());
 						throw ex;
 					}
 				} else if (deductSouth9697ArrearData != -1
 						|| deductWest9697ArrearData != -1
 						|| deductChqnad9697ArrearData != -1) {
+					System.out.println("43");
 					readData = common.readExcelSheet(fileName);
 					IDAO.deductSouth9697ArrearData(readData);
 					lengths = "Arrear data deducted SuccessFully";
@@ -696,39 +741,47 @@ public class PensionService {
 						|| importWest9697ArrearData != -1
 						|| importChqnad9697ArrearData != -1
 						|| officeComplexDparrears0809 != -1) {
+					System.out.println("44");
 					readData = common.readExcelSheet(fileName);
 					try {
+						System.out.println("45");
 						// IDAO.importSouthArr9697(readData);
 						IDAO.importOfficeComplexDparrears(readData, userName,
 								ipAddress);
 					} catch (Exception e) {
 
+						System.out.println("46");
 					}
 					// IDAO.importChqnadArr9697(readData);
 					lengths = "Arrear data deducted SuccessFully";
 				} else if (deleteTransactions != -1) {
+					System.out.println("47");
 					readData = common.readExcelSheet(fileName);
 					IDAO.deleteTransactions(readData);
 					lengths = "Records deleted SuccessFully";
 
 				} else if (deleteDuplicateRecorsRausap != -1) {
+					System.out.println("48");
 					readData = common.readExcelSheet(fileName);
 					IDAO.deleteDuplicateRecorsRausap(readData, userName,
 							ipAddress);
 					lengths = "duplicate records deleted in RAUSAP";
 
 				} else if (generateNewPFIDs != -1) {
+					System.out.println("49");
 					readData = common.readExcelSheet(fileName);
 					IDAO.generateNewPFIDs(readData, userName, ipAddress);
 					lengths = "New PfIDs Generated ";
 
 				} else if (updateEmployeenametoMasterFromTrans != -1) {
+					System.out.println("50");
 					readData = common.readExcelSheet(fileName);
 					IDAO.updateEmployeenametoMasterFromTrans(readData,
 							userName, ipAddress);
 					lengths = "EmployeeNames updated ";
 
 				} else if (updateFinaceDatahavingCpfaccnoBlank != -1) {
+					System.out.println("51");
 					readData = common.readExcelSheet(fileName);
 					IDAO.updateFinaceDatahavingCpfaccnoBlank1(readData,
 							userName, ipAddress);
@@ -1175,6 +1228,11 @@ public class PensionService {
 						// String fileName1 =
 						// fileName.substring(fileName.lastIndexOf("\\") + 1,
 						// fileName.length());
+						log.info("Persion Service : readData " + readData);
+						log.info("userName : " + userName);
+						log.info("ipAddress : " + ipAddress);
+						log.info("fileName1 : " + fileName1);
+						
 						String message = IDAO.arrearBreakupFormat(readData,
 								userName, ipAddress, fileName1);
 						log.info("" + fileName.indexOf("/"));

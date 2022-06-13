@@ -1679,7 +1679,7 @@ var accessCode='<%=accessCode%>',url="";
 				
 			 
 				
-				System.out.println("==PensionIntrst======="+PensionIntrst);
+				System.out.println("==PensionIntrst====prasa==="+PensionIntrst);
 				if(grandTotDiffShowFlag.equals("true")){
 					  result =  adjCrtnDAO.savepcadjcrtnCurrenttotals(empSerialNo,adjOBYear,transid,form2Status,grandEmoluments,grandCPF,grandCPFInterest,
 					   										grandPension,grandPensionInterest,grandPFContribution,grandPFContributionInterest,

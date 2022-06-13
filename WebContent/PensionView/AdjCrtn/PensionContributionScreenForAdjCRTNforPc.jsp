@@ -6,11 +6,17 @@
 <%@ page import="aims.bean.*"%>
 <%@ page import="aims.dao.*"%>
 <%@ page import="aims.service.AdjCrtnService" %>
+<%@page import="org.apache.log4j.Logger"%>
 <%
+
+	Logger log = Logger.getLogger(request.getRequestURI());
+	
 	String path = request.getContextPath();
+	log.info("====Path pensionContributionScreenForAdjCRTNfor Pc " + path);
 	String basePath = request.getScheme() + "://"
 			+ request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
+			log.info("base path : " + basePath);
 	AdjCrtnService adjCrtnService = new AdjCrtnService();
 	ArrayList a = new ArrayList();
 	String color = "yellow";
@@ -49,22 +55,29 @@
 	CommonUtil commonUtil = new CommonUtil();
 	AdjCrtnDAO adjCrtnDAO = new AdjCrtnDAO();
 	String fullWthrOptionDesc = "", genderDescr = "", mStatusDec = "";
-	String employeeNm = "", pensionNo = "", doj = "", dob = "", cpfacno = "", employeeNO = "", designation = "", fhName = "", gender = "", fileName = "";
-	String reportType = "", whetherOption = "", dateOfEntitle = "", empSerialNo = "", mStatus = "", region1 = "", cpfaccno1 = "",station ="";
+	String employeeNm = "", pensionNo = "", doj = "", dob = "", cpfacno = "", employeeNO = "", designation = "", 
+	fhName = "", gender = "", fileName = "";
+	String reportType = "", whetherOption = "", dateOfEntitle = "", empSerialNo = "", mStatus = "", region1 = "", 
+	cpfaccno1 = "",station ="";
 	String  cpfTotal= "",PenContriTotal= "",PFTotal="",emolumentsTotal="",empSubTotal = "",	AAIContriTotal = "";
 	 
-	double totalEmoluments = 0.0, pfStaturary = 0.0, totalPension = 0.0, empVpf = 0.0, principle = 0.0, interest = 0.0, pfContribution = 0.0;
+	double totalEmoluments = 0.0, pfStaturary = 0.0, totalPension = 0.0, empVpf = 0.0, principle = 0.0, 
+	interest = 0.0, pfContribution = 0.0;
 	double grandEmoluments = 0.0, grandCPF = 0.0, grandPension = 0.0, grandPFContribution = 0.0;
-	double cpfInterest = 0.0, pensionInterest = 0.0, pfContributionInterest = 0.0,empSubInterest = 0.0, aaiContriInterest = 0.0;
+	double cpfInterest = 0.0, pensionInterest = 0.0, pfContributionInterest = 0.0,empSubInterest = 0.0, 
+	aaiContriInterest = 0.0;
 	double grandCPFInterest = 0.0, grandPensionInterest = 0.0, grandPFContributionInterest = 0.0;
 	double cumPFStatury = 0.0, cumPension = 0.0, cumPfContribution = 0.0;
 	double cpfOpeningBalance = 0.0, penOpeningBalance = 0.0, pfOpeningBalance = 0.0, empSubOpeningBalance = 0.0, aaiContriOpeningBalance =0.0; 
 	double percentage = 0.0,advanceAmt =0.00, pfwSubAmt =0.00,pfwContriAmt = 0.00, subTotal=0.00,empSubscri=0.00,aaiContri = 0.00,pf = 0.00,cumempSubscri = 0.00, cumAAiContri=0.00, aaiContriTot =0.00,  empSubscriTot=0.00;
 	double  grandEmpSub =0.00,grandEmpSubInterest =0.00,grandAAIContri=0.00,grandAAIContriInterest=0.00;
+	
 	if (request.getAttribute("reportType") != null) {
+		log.info("1");
 		reportType = (String) request.getAttribute("reportType");
 		if (reportType.equals("Excel Sheet")
 				|| reportType.equals("ExcelSheet")) {
+					log.info("2");
 			fileName = "Pension_Contribution_report.xls";
 			response.setContentType("application/vnd.ms-excel");
 			response.setHeader("Content-Disposition","attachment; filename=" + fileName);
@@ -77,7 +90,9 @@
 	String cntFlag = "";
 	int size = 0,countj=0; 
 	size = PensionContributionList.size();
+	
 	for (int i = 0; i < PensionContributionList.size(); i++) {
+		log.info("for block : " + i);
 		PensionContBean contr = (PensionContBean) PensionContributionList
 				.get(i);
 		session.setAttribute("PersonalInfo",contr);
@@ -85,24 +100,33 @@
 		pensionNo = contr.getPensionNo();
 		empSerialNo = contr.getEmpSerialNo();
 		doj = contr.getEmpDOJ();
-		dob = contr.getEmpDOB();		 	 
+		dob = contr.getEmpDOB();
+log.info("for block 2 : " + i);		
 		cpfacno = StringUtility.replaces(
 				contr.getCpfacno().toCharArray(), ",=".toCharArray(),
 				",").toString();
 
+log.info("for block 2 : " + i);	
+
 		if (cpfacno.indexOf(",=") != -1) {
-			cpfacno = cpfacno.substring(1, cpfacno.indexOf(",="));
+			log.info("if cpfpacno : " + cpfacno);
+			cpfacno = cpfacno.substring(0, cpfacno.indexOf(",="));
+			log.info("if cpfpacno2 : " + cpfacno);
 		} else if (cpfacno.indexOf(",") != -1) {
+			log.info("cpfacno else ");
 			cpfacno = cpfacno.substring(cpfacno.indexOf(",") + 1,
 					cpfacno.length());
 		}
 		whetherOption = contr.getWhetherOption();
 		if (whetherOption.toUpperCase().trim().equals("A")) {
+			log.info("equal A");
 			fullWthrOptionDesc = "Full Pay";
 		} else if (whetherOption.toUpperCase().trim().equals("B")
 				|| whetherOption.toUpperCase().trim().equals("NO")) {
+					log.info("equal B");
 			fullWthrOptionDesc = "Ceiling Pay";
 		} else {
+			log.info("equal else");
 			fullWthrOptionDesc = whetherOption;
 		}
 		employeeNO = contr.getEmployeeNO();
@@ -120,16 +144,20 @@
 	
 		finalsettlmentdate.replaceAll("-","/");
 		if (gender.trim().toLowerCase().equals("m")) {
+			log.info("equal m");
 			genderDescr = "Male";
 		} else if (gender.trim().toLowerCase().equals("f")) {
+			log.info("equal f");
 			genderDescr = "Female";
 		} else {
+			log.info("equal gender");
 			genderDescr = gender;
 		}
 		mStatus = contr.getMaritalStatus().trim();
 
 		if (mStatus.toLowerCase().equals("m")
 				|| (mStatus.toLowerCase().trim().equals("yes"))) {
+					
 			mStatusDec = "Married";
 		} else if (mStatus.toLowerCase().equals("u")
 				|| (mStatus.toLowerCase().trim().equals("no"))) {

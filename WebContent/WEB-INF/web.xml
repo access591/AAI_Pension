@@ -194,11 +194,12 @@
 	<welcome-file-list>
 		<welcome-file>PensionIndex.jsp</welcome-file>
 	</welcome-file-list>
+	
 	<error-page>
 		<exception-type>java.sql.SQLException</exception-type>
-
 		<location>/PensionIndex.jsp</location>
-	</error-page>
+	</error-page> 
+	
 	<!-- <jsp-config> -->
 		<taglib>
 			<taglib-uri>/tags-display</taglib-uri>

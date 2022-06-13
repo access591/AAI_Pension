@@ -38,6 +38,10 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+
 import jxl.Cell;
 import jxl.CellType;
 import jxl.FormulaCell;
@@ -58,6 +62,7 @@ import jxl.write.WriteException;
 import oracle.sql.BLOB;
 import aims.bean.EmpMasterBean;
 import aims.bean.RegionBean;
+
 /* 
 ##########################################
 #Date					Developed by			Issue description
@@ -75,10 +80,11 @@ import aims.bean.RegionBean;
 public class CommonUtil implements Constants {
 	static Log log = new Log(CommonUtil.class);
 
-	DBUtils commonDB = new DBUtils();	
-	static String[] units = { "", "One", "Two", "Three", "Four", "Five", "Six","Seven", "Eight", "Nine", "Ten" };
-	static String tenPlus[] = { "Ten", "Eleven", "Twelve", "Thirteen","Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen","Nineteen", "Twenty" };
-	static String tens[] = { "", "Ten", "Twenty", "Thirty", "Fourty", "Fifty","Sixty", "Seventy", "Eighty", "Ninety" };
+	DBUtils commonDB = new DBUtils();
+	static String[] units = { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten" };
+	static String tenPlus[] = { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+			"Eighteen", "Nineteen", "Twenty" };
+	static String tens[] = { "", "Ten", "Twenty", "Thirty", "Fourty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" };
 
 	/**
 	 * @param args
@@ -90,81 +96,202 @@ public class CommonUtil implements Constants {
 		int gridLength = 0;
 		LoadProperties getProperties = new LoadProperties();
 		Properties prop = new Properties();
-		prop = getProperties
-				.loadFile(Constants.APPLICATION_PROPERTIES_FILE_NAME);
+		prop = getProperties.loadFile(Constants.APPLICATION_PROPERTIES_FILE_NAME);
 		if (prop.getProperty("common.gridlength") != null) {
-			gridLength = Integer
-					.parseInt(prop.getProperty("common.gridlength"));
+			gridLength = Integer.parseInt(prop.getProperty("common.gridlength"));
 		}
 		return gridLength;
 	}
-	public String readExcelSheet(String fileName) throws BiffException,
-	IOException, InvalidDataException {
-         log.info("CommonUtil:readExcelSheet Entering method");
-       String readExcelData = "";
-      WorkbookSettings ws = new WorkbookSettings();
-      ws.setLocale(new Locale("en", "EN"));
-      try {
-	    Workbook workbook = Workbook.getWorkbook(new File(fileName), ws);
-	    Sheet s = workbook.getSheet(0);
-	    // Sheet s = workbook.getSheet(3);
-	   log.info("fileName"+fileName);
-	   int readMonthlyTRData = fileName.indexOf("AAIEPF-3");
-		int readMonthlyArrData = fileName.indexOf("AAIEPF-3A");			
-		int readMonthlySuppliData = fileName.indexOf("AAIEPF-3-SUPPL");	   
-	   int readYearlyOB = fileName.indexOf("AAIEPF-1");
-	   int readEmpOBData = fileName.indexOf("AAIEPF-2");
-	   int readAdvancePFW = fileName.indexOf("AAIEPF-8"); 
-	   int readsingleData = fileName.indexOf("AAIEPF-SINGLEVALUE");
-	   int readAaiepf4 = fileName.indexOf("AAIEPF-4");
-	   int readArearbreakup = fileName.indexOf("ARREARBREAKUP_UPLOAD");
-	   log.info("readMonthlyArrData"+readMonthlyArrData);
-	   log.info("readMonthlyTRData"+readMonthlyTRData);
-	   log.info("importMonthwiseSupplData"+readMonthlySuppliData);
-	if(readMonthlySuppliData != -1 ){
-		readExcelData = readDataSheetSuppli(s);
-	}else if(readMonthlyArrData != -1){
-		readExcelData = readDataSheetArrear(s);
-	}else if(readAaiepf4 != -1 || readsingleData !=-1){
-		readExcelData = readDataSheet4single(s);
-	}else if (readMonthlyTRData != -1) {
-		log.info("fileName"+fileName);
-		readExcelData = readDataSheetMonthly(s,fileName);
-	}else if(readEmpOBData != -1){	
-		readExcelData=readForm2Data(s);
-	}else if (readYearlyOB != -1 || readAdvancePFW != -1
-			|| readArearbreakup != -1) {
-		readExcelData = readDataSheet2(s, fileName);
-	} else {
-		readExcelData = readDataSheet(s);
+
+	public String readExcelSheet(String fileName) throws BiffException, IOException, InvalidDataException {
+		log.info("CommonUtil:readExcelSheet Entering method");
+		String readExcelData = "";
+		WorkbookSettings ws = new WorkbookSettings();
+		ws.setLocale(new Locale("en", "EN"));
+		try {
+			log.info("try block ..");
+			log.info("File Name  .." + fileName);
+			log.info("**************************************123");
+			
+			
+			ws.setEncoding("Cp1252");
+			
+			log.info("**************************************");
+			int readMonthlyTRData = fileName.indexOf("AAIEPF-3");
+			log.info("==readMonthlyTRData " + readMonthlyTRData);
+			int readMonthlyArrData = fileName.indexOf("AAIEPF-3A");
+			log.info("==readMonthlyArrData " + readMonthlyArrData);
+			int readMonthlySuppliData = fileName.indexOf("AAIEPF-3-SUPPL");
+			log.info("==readMonthlySuppliData " + readMonthlySuppliData);
+			int readYearlyOB = fileName.indexOf("AAIEPF-1");
+			log.info("==readYearlyOB " + readYearlyOB);
+			int readEmpOBData = fileName.indexOf("AAIEPF-2");
+			log.info("==readEmpOBData " + readEmpOBData);
+			int readAdvancePFW = fileName.indexOf("AAIEPF-8");
+			log.info("==readAdvancePFW " + readAdvancePFW);
+			int readsingleData = fileName.indexOf("AAIEPF-SINGLEVALUE");
+			log.info("==readsingleData " + readsingleData);
+			int readAaiepf4 = fileName.indexOf("AAIEPF-4");
+			log.info("==readAaiepf4 " + readAaiepf4);
+			
+			
+			log.info("readMonthlyTRData" + readMonthlyTRData);
+			log.info("importMonthwiseSupplData" + readMonthlySuppliData);
+			int readArearbreakup = fileName.indexOf("ARREARBREAKUP_UPLOAD");
+			log.info("==readArearbreakup " + readArearbreakup);
+			
+			Sheet s = null;
+			//org.apache.poi.hssf.usermodel.HSSFSheet sheet = null ;
+			
+			FileInputStream fi = new FileInputStream(fileName);
+ 			Workbook workbook = Workbook.getWorkbook(fi);
+			
+			s = workbook.getSheet(0);
+			
+//			if (readYearlyOB != -1 || readAdvancePFW != -1 || readArearbreakup != -1) {
+//				
+//				//readExcelData = readDataSheet2(s, fileName);
+//				FileInputStream fis=new FileInputStream(new File(fileName));  
+//				
+//				org.apache.poi.hssf.usermodel.HSSFWorkbook wb=new org.apache.poi.hssf.usermodel.HSSFWorkbook(fis);   	
+//				sheet=wb.getSheetAt(0);  
+//				
+//				
+//			}else {
+//				
+//				Workbook workbook = Workbook.getWorkbook(new File(fileName), ws);
+//				
+//				s = workbook.getSheet(0);
+//			}
+			
+		
+			// Sheet s = workbook.getSheet(3);
+			
+			
+			if (readMonthlySuppliData != -1) {
+				log.info("1");
+				readExcelData = readDataSheetSuppli(s);
+			} else if (readMonthlyArrData != -1) {
+				log.info("2");
+				readExcelData = readDataSheetArrear(s);
+			} else if (readAaiepf4 != -1 || readsingleData != -1) {
+				log.info("3");
+				readExcelData = readDataSheet4single(s);
+			} else if (readMonthlyTRData != -1) {
+				log.info("4");
+			
+				readExcelData = readDataSheetMonthly(s, fileName);
+			} else if (readEmpOBData != -1) {
+				log.info("5");
+				readExcelData = readForm2Data(s);
+			} 
+			
+			
+			else if (readYearlyOB != -1 || readAdvancePFW != -1 || readArearbreakup != -1) {
+				log.info("7");
+				//readExcelData = myReadDataSheet(sheet, fileName);
+				readExcelData = readDataSheet2(s, fileName);
+				//readExcelData = readDataSheetArrear(s);
+			} 
+		
+			else {
+				log.info("6");	
+				readExcelData = readDataSheet(s);
+			}
+			
+		} catch (BiffException ex) {
+			log.info("ëxception===> BiffException" + ex.toString());
+			log.printStackTrace(ex);
+			
+			String msg = "The extension of the file is not allowed to be uploaded , Need to be  in  .xls Extension(97-2003 Workbook).";
+			throw new InvalidDataException(msg);
+		} catch (IOException e) {
+			log.info("=====> IOEXception : " + e.toString());
+			
+			// TODO Auto-generated catch block
+			log.printStackTrace(e);
+			throw e;
+		} catch (Exception ex) {
+			log.info("=====> EXception : " + ex.toString());
+			// TODO Auto-generated catch block
+			throw new InvalidDataException(ex.getMessage());
+		}
+		log.info("CommonUtil:readExcelSheet leaving method");
+		return readExcelData;
 	}
-} catch (BiffException ex) {
-	log.printStackTrace(ex);
-	String msg="The extension of the file is not allowed to be uploaded , Need to be  in  .xls Extension(97-2003 Workbook).";
-	throw new InvalidDataException(msg);		
-}catch (IOException e) {
-	// TODO Auto-generated catch block
-	log.printStackTrace(e);
-	throw e;
-}catch (Exception ex) {
-	// TODO Auto-generated catch block
-	throw new InvalidDataException(ex.getMessage());		
-}
-log.info("CommonUtil:readExcelSheet leaving method");
-return readExcelData;
-}
 
-	public Map readMulitpleExcelSheets(String fileName) throws BiffException,
-			IOException, InvalidDataException {
+	
+	//my function for Arrear breakup 
+	private String myReadDataSheet(HSSFSheet sheet, String fileName) {
+		
+		log.info("My CommonUtil:readDataSheet Entering method");
+		//org.apache.poi.ss.usermodel.Cell cell = null;
+		StringBuffer eachRow = new StringBuffer();
+		//log.info("Columns" + sheet.getColumns() + "Rows" + s.getRows());
+		String delimiter = "*", cellContent = "";
+		Iterator<Row> rowIterator = sheet.iterator();
+		
+		while(rowIterator.hasNext()) {
+			 Row row = rowIterator.next();
+	         Iterator<org.apache.poi.ss.usermodel.Cell> cellIterator = row.cellIterator();
+	         
+	         while(cellIterator.hasNext()) {
+	        	
+	        	 DataFormatter formatter = new DataFormatter();
+                 
+                 
+	        	 org.apache.poi.ss.usermodel.Cell cell = cellIterator.next();
+	        	 String text = formatter.formatCellValue(cell);
+                 
+	        	 //String Tag=cell.getStringCellValue().toString();
+                // log.info("============================================> Tag " + Tag);
+                 
+                
+                 //cell = row.getCell(0+1);
+               
+                
+                 
+                
+				//cell = s.getCell(i, j);
+                 
+                 if(text !=null) {
+                	 log.info("11");
+                	 if (!text.equals("")) {
+                		 log.info("12");
+     					cellContent = StringUtility.replace(text.toCharArray(), delimiter.toCharArray(), "")
+     							.toString();
+     					// System.out.println("Format"+cell.getType()+"Contents"+cell.getContents());
+     					if (!cellContent.equals("")) {
+     						 log.info("13");
+     						eachRow.append(text + "@");
+     					} else {
+     						 log.info("14");
+     						eachRow.append("XXX" + "@");
+     					}
+     				} else {
+     					 log.info("15");
+     					eachRow.append("XXX" + "@");
+     				}
+                	 
+                 }
+				
+			}
+			eachRow.append("***");
+		}
+		// log.info(eachRow.toString());
+		log.info("my CommonUtil:readDataSheet Leaving method");
+		return eachRow.toString();
+		
+	}
 
-		log.info("CommonUtil:readMulitpleExcelSheets Entering method"
-				+ fileName);
+	public Map readMulitpleExcelSheets(String fileName) throws BiffException, IOException, InvalidDataException {
+
+		log.info("CommonUtil:readMulitpleExcelSheets Entering method" + fileName);
 		String calculsheetfolder = "", form2sheetfolder = "", epffolder = "", slashsuffix = "";
 		Map multiplefilslst = new HashMap();
 		HashMapComparable hcomp = new HashMapComparable();
 		try {
-			ResourceBundle bundle = ResourceBundle
-					.getBundle("aims.resource.ApplicationResouces");
+			ResourceBundle bundle = ResourceBundle.getBundle("aims.resource.ApplicationResouces");
 			epffolder = bundle.getString("upload.folder.path.epf");
 			calculsheetfolder = bundle.getString("upload.folder.path.epf.cal");
 			form2sheetfolder = bundle.getString("upload.folder.path.epf.form2");
@@ -175,19 +302,14 @@ return readExcelData;
 			ws.setLocale(new Locale("er", "ER"));
 			Workbook workbook = Workbook.getWorkbook(file, ws);
 			int numberOfSheets = workbook.getNumberOfSheets();
-			//log.info("workbook"+workbook.getVersion());
-			//log.info("workbook"+workbook.getSheet("AAIEPF2_REC"));
-			
-			
+			// log.info("workbook"+workbook.getVersion());
+			// log.info("workbook"+workbook.getSheet("AAIEPF2_REC"));
+
 			CommonUtil util = new CommonUtil();
 			WritableWorkbook wwk = null;
-			log
-					.info("readMulitpleExcelSheets::numberOfSheets"
-							+ numberOfSheets);
-			calfilename = calculsheetfolder + slashsuffix
-					+ Constants.ADJ_CAL_FILE_NAME_PREFIX;
-			form2sheetname = form2sheetfolder + slashsuffix
-					+ Constants.ADJ_FORM2_FILE_NAME_PREFIX;
+			log.info("readMulitpleExcelSheets::numberOfSheets" + numberOfSheets);
+			calfilename = calculsheetfolder + slashsuffix + Constants.ADJ_CAL_FILE_NAME_PREFIX;
+			form2sheetname = form2sheetfolder + slashsuffix + Constants.ADJ_FORM2_FILE_NAME_PREFIX;
 			File epffolderexts = new File(epffolder);
 			if (!epffolderexts.exists()) {
 				File saveDir = new File(epffolder);
@@ -212,21 +334,19 @@ return readExcelData;
 			}
 			for (int shtcnt = 0; shtcnt < numberOfSheets; shtcnt++) {
 				Sheet s = workbook.getSheet(shtcnt);
-				log.info("Sheet name"+s.getName()+"Sheet Columns "+s.getColumns()+"Contants Columns"+FORM2_NO_OF_COLUMNS);
+				log.info("Sheet name" + s.getName() + "Sheet Columns " + s.getColumns() + "Contants Columns"
+						+ FORM2_NO_OF_COLUMNS);
 				if (shtcnt == 0 || s.getName().equals("AAIEPF2_REC")) {
-					if(s.getColumns()!=Integer.parseInt(FORM2_NO_OF_COLUMNS)){
+					if (s.getColumns() != Integer.parseInt(FORM2_NO_OF_COLUMNS)) {
 						throw new InvalidDataException("Orignial Form-2 Sheet and Uploaded Sheet Columns is not match");
 					}
-					portedfilenames = form2sheetname
-							+ util.getCurrentDate("ddmmyy HHmmsssSSS") + "_"
+					portedfilenames = form2sheetname + util.getCurrentDate("ddmmyy HHmmsssSSS") + "_"
 							+ Constants.ADJ_CAL_FILE_NAME_SUFFIX;
-					log.info("ppp00000000000"+portedfilenames);
+					log.info("ppp00000000000" + portedfilenames);
 				} else {
-					portedfilenames = calfilename
-							+ util.getCurrentDate("ddmmyy HHmmsssSSS") + "_"
-							+ s.getName().trim()
+					portedfilenames = calfilename + util.getCurrentDate("ddmmyy HHmmsssSSS") + "_" + s.getName().trim()
 							+ Constants.ADJ_CAL_FILE_NAME_SUFFIX;
-					log.info("ppp11111111"+portedfilenames);
+					log.info("ppp11111111" + portedfilenames);
 				}
 
 				if (s.getNumberOfImages() == 0) {
@@ -234,18 +354,17 @@ return readExcelData;
 					wwk.importSheet(s.getName(), 0, s);
 					wwk.write();
 					wwk.close();
-					
-					log.info("ppp2222222222"+portedfilenames);
+
+					log.info("ppp2222222222" + portedfilenames);
 				} else {
 					Image i = s.getDrawing(0);
-					calfilename = calfilename
-							+ util.getCurrentDate("ddmmyy HHmmsssSSS") + "_"
-							+ s.getName().trim() + ".jpg";
-					portedfilenames=calfilename;
+					calfilename = calfilename + util.getCurrentDate("ddmmyy HHmmsssSSS") + "_" + s.getName().trim()
+							+ ".jpg";
+					portedfilenames = calfilename;
 					getImage(i, calfilename);
-					log.info("ppp33333333333"+portedfilenames);
+					log.info("ppp33333333333" + portedfilenames);
 				}
-				log.info("portedfilenames"+portedfilenames);
+				log.info("portedfilenames" + portedfilenames);
 				multiplefilslst.put(s.getName().trim(), portedfilenames);
 			}
 
@@ -256,54 +375,55 @@ return readExcelData;
 		} catch (WriteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			// TODO Auto-generated catch block
-			throw new InvalidDataException("The Sheet can't Read,Please Use Another Excel Sheet");		
+			throw new InvalidDataException("The Sheet can't Read,Please Use Another Excel Sheet");
 		}
 		return hcomp.sortHashMap(multiplefilslst);
-	
-	}
-public String createFile(String filename,String extension,String data){
-	String path="",rpfcfolder="",rpfcform6="",filenamewithpath="",slashsuffix="";
-	CommonUtil util = new CommonUtil();
-	FileWriter fw = null;
-	ResourceBundle bundle = ResourceBundle
-	.getBundle("aims.resource.ApplicationResouces");
-	rpfcfolder = bundle.getString("upload.folder.path.rpfc");
-	rpfcform6=bundle.getString("upload.folder.path.rpfc.form6");
-	slashsuffix=bundle.getString("upload.folder.path.slashsuffix");
-	File rpfcfolderexts = new File(rpfcfolder);
-	if (!rpfcfolderexts.exists()) {
-		File saveDir = new File(rpfcfolder);
-		if (!saveDir.exists())
-			saveDir.mkdirs();
 
 	}
-	File rpfcform6folder = new File(rpfcform6);
-	if (!rpfcform6folder.exists()) {
-		File saveDir = new File(rpfcform6);
-		if (!saveDir.exists())
-			saveDir.mkdirs();
 
+	public String createFile(String filename, String extension, String data) {
+		String path = "", rpfcfolder = "", rpfcform6 = "", filenamewithpath = "", slashsuffix = "";
+		CommonUtil util = new CommonUtil();
+		FileWriter fw = null;
+		ResourceBundle bundle = ResourceBundle.getBundle("aims.resource.ApplicationResouces");
+		rpfcfolder = bundle.getString("upload.folder.path.rpfc");
+		rpfcform6 = bundle.getString("upload.folder.path.rpfc.form6");
+		slashsuffix = bundle.getString("upload.folder.path.slashsuffix");
+		File rpfcfolderexts = new File(rpfcfolder);
+		if (!rpfcfolderexts.exists()) {
+			File saveDir = new File(rpfcfolder);
+			if (!saveDir.exists())
+				saveDir.mkdirs();
+
+		}
+		File rpfcform6folder = new File(rpfcform6);
+		if (!rpfcform6folder.exists()) {
+			File saveDir = new File(rpfcform6);
+			if (!saveDir.exists())
+				saveDir.mkdirs();
+
+		}
+
+		filenamewithpath = rpfcform6folder + slashsuffix + filename + "_" + util.getCurrentDate("ddmmyy HHmmsssSSS")
+				+ extension;
+
+		try {
+			fw = new FileWriter(new File(filenamewithpath));
+			BufferedWriter bw = new BufferedWriter(fw, 32768);
+
+			bw.write(data);
+			bw.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		path = filenamewithpath;
+		return path;
 	}
-	
-	filenamewithpath=rpfcform6folder + slashsuffix+filename+"_"+ util.getCurrentDate("ddmmyy HHmmsssSSS") + extension;
-	
-	
-	try {
-		fw = new FileWriter(new File(filenamewithpath));
-		BufferedWriter bw = new BufferedWriter(fw, 32768);
 
-		bw.write(data);
-		bw.close();
-
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	path=filenamewithpath;
-	return path;
-}
 	private String readDataSheet(Sheet s) {
 		log.info("CommonUtil:readDataSheet Entering method");
 		Cell cell = null;
@@ -314,9 +434,8 @@ public String createFile(String filename,String extension,String data){
 			for (int i = 0; i < s.getColumns(); i++) {
 				cell = s.getCell(i, j);
 				if (!cell.getContents().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();
+					cellContent = StringUtility.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "")
+							.toString();
 					// System.out.println("Format"+cell.getType()+"Contents"+cell.getContents());
 					if (!cellContent.equals("")) {
 						eachRow.append(cell.getContents() + "@");
@@ -333,455 +452,519 @@ public String createFile(String filename,String extension,String data){
 		log.info("CommonUtil:readDataSheet Leaving method");
 		return eachRow.toString();
 	}
-	private String readDataSheetMonthly(Sheet s,String fileName) throws BiffException, InvalidDataException {
+
+	private String readDataSheetMonthly(Sheet s, String fileName) throws BiffException, InvalidDataException {
+		
 		log.info("CommonUtil:readDataSheetMonthly Entering method");
 		Cell cell = null;
 		Connection con = null;
 		Statement st = null;
-		ResultSet rs = null;		
+		ResultSet rs = null;
 		StringBuffer eachRow = new StringBuffer();
 		ArrayList exceptionList = new ArrayList();
-		
+
 		try {
-			log.info("rows"+s.getRows()+"cols"+s.getColumns());
+			log.info("rows" + s.getRows() + "cols" + s.getColumns());
 			ResourceBundle bundle = ResourceBundle.getBundle("aims.resource.ApplicationResouces");
 			con = commonDB.getConnection();
 			st = con.createStatement();
-			String fileName1 = fileName.substring(fileName.lastIndexOf(bundle.getString("upload.folder.path.slashsuffix")) + 1,fileName.length());
-			String importMonthStatus = "select lower(FILENAME) as FILENAME,IMPORTSTATUS FROM payment_recov_mnth_upload_log where  lower(filename)='"+fileName1.toLowerCase()+"'";
-		log.info(importMonthStatus);
-		rs = st.executeQuery(importMonthStatus);
-		while (rs.next()) {
-			log.info("IMPORTSTATUS"+rs.getString("IMPORTSTATUS")+"FILENAME"+rs.getString("FILENAME").trim()+"filename"+fileName1.toLowerCase()+s.getColumns());
-			if (rs.getString("IMPORTSTATUS").equals("Y")&& rs.getString("FILENAME").trim().equals(fileName1.toLowerCase().trim())) {
-				exceptionList.add( ""+fileName1+ " Sheet Already Imported");
-			}			
-		}	
-		if( s.getColumns()==0 || s.getRows()==0){			
-			exceptionList.add("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");			
-		}else if(s.getRows()<=11){
-			exceptionList.add("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
-		}
-		if(s.getColumns()<22){
-			exceptionList.add("Please Submit the Data in the New Standard sheet (Download it from the Download Standard sheet for CPF data)");
-		}
-		String delimiter = "*", cellContent = "",cellCont="";
-		String sss="",blankRow="",emolEpf="",emol0Epf0="",monAc="";
-		int count=0,count1=0,count3=0;	
-		for (int j = 10; j < s.getRows(); j++) {
-			for (int i = 0; i < s.getColumns(); i++) {
-				cell = s.getCell(i, j);	
-				if(j>=11){
-					if(!s.getCell(i,j).getContents().equals("")){
-					if(i==0 || i==1){
-						if(cell.getContents().trim().equals("") || cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")){
-							count++;
-							blankRow="Sheet contain blank rows in between the Data in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"";
+			String fileName1 = fileName.substring(
+					fileName.lastIndexOf(bundle.getString("upload.folder.path.slashsuffix")) + 1, fileName.length());
+			String importMonthStatus = "select lower(FILENAME) as FILENAME,IMPORTSTATUS FROM payment_recov_mnth_upload_log where  lower(filename)='"
+					+ fileName1.toLowerCase() + "'";
+			log.info(importMonthStatus);
+			rs = st.executeQuery(importMonthStatus);
+			while (rs.next()) {
+				log.info("IMPORTSTATUS" + rs.getString("IMPORTSTATUS") + "FILENAME" + rs.getString("FILENAME").trim()
+						+ "filename" + fileName1.toLowerCase() + s.getColumns());
+				if (rs.getString("IMPORTSTATUS").equals("Y")
+						&& rs.getString("FILENAME").trim().equals(fileName1.toLowerCase().trim())) {
+					exceptionList.add("" + fileName1 + " Sheet Already Imported");
+				}
+			}
+			if (s.getColumns() == 0 || s.getRows() == 0) {
+				exceptionList.add("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");
+			} else if (s.getRows() <= 11) {
+				exceptionList.add(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
+			}
+			if (s.getColumns() < 22) {
+				exceptionList.add(
+						"Please Submit the Data in the New Standard sheet (Download it from the Download Standard sheet for CPF data)");
+			}
+			String delimiter = "*", cellContent = "", cellCont = "";
+			String sss = "", blankRow = "", emolEpf = "", emol0Epf0 = "", monAc = "";
+			int count = 0, count1 = 0, count3 = 0;
+			for (int j = 10; j < s.getRows(); j++) {
+				for (int i = 0; i < s.getColumns(); i++) {
+					cell = s.getCell(i, j);
+					if (j >= 11) {
+						if (!s.getCell(i, j).getContents().equals("")) {
+							if (i == 0 || i == 1) {
+								if (cell.getContents().trim().equals("") || cell.getContents().trim().equals("0")
+										|| cell.getContents().equals("0.00")) {
+									count++;
+									blankRow = "Sheet contain blank rows in between the Data in Row: "
+											+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "";
+								}
+							}
+							if (i == 8 || i == 18) {
+								if (cell.getContents().trim().equals("")) {
+									count3++;
+									monAc = "Sorry...! Field cannot be empty Please enter the valid data in Row: "
+											+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "";
+								}
+							}
 						}
-					}				
-				if(i==8 || i==18){					
-					if(cell.getContents().trim().equals("")){
-						count3++;
-						monAc="Sorry...! Field cannot be empty Please enter the valid data in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"";
 					}
-					}
-				}
-				}
-				if (!cell.getContents().trim().equals("")) {					
-					if(j>=11){	
-					if(i>=9 && i<=17){
-						cellCont = StringUtility.replace(
-								cell.getContents().toCharArray(),
-								delimiter.toCharArray(), "").toString();
-							double cellvalue=Double.parseDouble(cellCont);
-                           }
-					}
-				}
-				if (!cell.getContents().trim().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();					
-			    //new code added  for invalid data,i.e,validation for special characters
-					if(cell.getType()==CellType.NUMBER){
-					if(cellContent.indexOf("(")!=-1 || cellContent.indexOf(")")!=-1 ||cellContent.indexOf("}")!=-1 || cellContent.indexOf("{")!=-1 || cellContent.indexOf("*")!=-1){
-						exceptionList.add("The invalid data '"+cell.getContents()+"' exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+					if (!cell.getContents().trim().equals("")) {
+						if (j >= 11) {
+							if (i >= 9 && i <= 17) {
+								cellCont = StringUtility
+										.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "")
+										.toString();
+								double cellvalue = Double.parseDouble(cellCont);
+							}
 						}
-					}					
-					//log.info("Test cellContent:"+cellContent);
-					if (!cellContent.trim().equals("")) {
-						eachRow.append(cell.getContents() + "@");
+					}
+					if (!cell.getContents().trim().equals("")) {
+						cellContent = StringUtility
+								.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "").toString();
+						// new code added for invalid data,i.e,validation for special characters
+						if (cell.getType() == CellType.NUMBER) {
+							if (cellContent.indexOf("(") != -1 || cellContent.indexOf(")") != -1
+									|| cellContent.indexOf("}") != -1 || cellContent.indexOf("{") != -1
+									|| cellContent.indexOf("*") != -1) {
+								exceptionList.add("The invalid data '" + cell.getContents() + "' exist in Row: "
+										+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+						}
+						// log.info("Test cellContent:"+cellContent);
+						if (!cellContent.trim().equals("")) {
+							eachRow.append(cell.getContents() + "@");
+						} else {
+							eachRow.append("XXX" + "@");
+						}
 					} else {
 						eachRow.append("XXX" + "@");
 					}
+				}
+				eachRow.append("***");
+			}
+			if (count != 0 || count1 != 0 || count3 != 0) {
+				if (count > 1) {
+					String message = "Sorry....! Sheet contain blank rows in SRNO/PENSIONNO Fields";
+					exceptionList.add(message);
 				} else {
-					eachRow.append("XXX" + "@");
+					exceptionList.add(blankRow);
+				}
+				if (count1 > 1) {
+					String message = "Sorry...! Field cannot be empty Please enter the valid data (Excepting only Numeric Values) exist in Emoluments/EPF";
+					exceptionList.add(message);
+				} else {
+					exceptionList.add(emolEpf);
+				}
+				if (count3 > 1) {
+					String message = "Sorry...! Field cannot be empty Please enter the valid data in Monthyear/Airportcode";
+					exceptionList.add(message);
+				} else {
+					exceptionList.add(monAc);
 				}
 			}
-			eachRow.append("***");
-		} 	if( count!=0 || count1!=0  || count3!=0){
-			if(count>1){
-				String message="Sorry....! Sheet contain blank rows in SRNO/PENSIONNO Fields";
-				exceptionList.add(message);
-			}else{
-				exceptionList.add(blankRow);
-			}
-			if(count1>1){
-				String message="Sorry...! Field cannot be empty Please enter the valid data (Excepting only Numeric Values) exist in Emoluments/EPF";
-				exceptionList.add(message);
-			}else{
-				exceptionList.add(emolEpf);
-			}
-			if(count3>1){
-				String message="Sorry...! Field cannot be empty Please enter the valid data in Monthyear/Airportcode";
-				exceptionList.add(message);
-			}else{
-				exceptionList.add(monAc);
-			}
-			}
-			log.info("count"+count+"count1"+count1+"count3"+count3);
-			log.info("exceptionList"+exceptionList.size());
+			log.info("count" + count + "count1" + count1 + "count3" + count3);
+			log.info("exceptionList" + exceptionList.size());
 			if (exceptionList.size() > 0) {
 				StringBuffer exceptionRecords = new StringBuffer();
-				String mesg="";
+				String mesg = "";
 				Set set = new HashSet();
 				StringBuffer newRecords = new StringBuffer();
-				
+
 				for (Iterator it = exceptionList.iterator(); it.hasNext();) {
 					Object element = it.next();
-					log.info("element"+element);
-					if(!element.equals("")){
-					if (set.add(element))
-						newRecords.append(element + "\r\n" + "-->");
-					}}
+					log.info("element" + element);
+					if (!element.equals("")) {
+						if (set.add(element))
+							newRecords.append(element + "\r\n" + "-->");
+					}
+				}
 				exceptionList.clear();
 				exceptionRecords.append(newRecords);
-				log.info("exceptionRecords"+exceptionRecords);					
-					mesg=""+ exceptionRecords;
+				log.info("exceptionRecords" + exceptionRecords);
+				mesg = "" + exceptionRecords;
 				throw new InvalidDataException(mesg);
-			}}catch (Exception e) {
-			log.info(e.toString());
-			String msg="";
-			String txt=e.toString();
-			if(txt.indexOf("java.lang.ArrayIndexOutOfBoundsException")!=-1){
-			 msg="Please Enter Valid Data ( Excepting only Numeric Values)";	
 			}
-			if(txt.indexOf("java.lang.NullPointerException")!=-1){
-				 msg="sorry....! Row cannot be blank Please Enter Valid Data in row:"+cell.getRow()+1+"";	
-				}
-			if(txt.indexOf("java.lang.NumberFormatException")!=-1){
-				 msg="Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:"+cell.getRow()+" and columns :"+cell.getColumn()+" )";	
-				}
-			
-	throw new InvalidDataException(msg +""+e.getMessage());
-		}finally{			
-				commonDB.closeConnection(con, st, rs);
+		} catch (Exception e) {
+			log.info(e.toString());
+			String msg = "";
+			String txt = e.toString();
+			if (txt.indexOf("java.lang.ArrayIndexOutOfBoundsException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values)";
+			}
+			if (txt.indexOf("java.lang.NullPointerException") != -1) {
+				msg = "sorry....! Row cannot be blank Please Enter Valid Data in row:" + cell.getRow() + 1 + "";
+			}
+			if (txt.indexOf("java.lang.NumberFormatException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:" + cell.getRow()
+						+ " and columns :" + cell.getColumn() + " )";
+			}
+
+			throw new InvalidDataException(msg + "" + e.getMessage());
+		} finally {
+			commonDB.closeConnection(con, st, rs);
 		}
 		log.info("CommonUtil:readDataSheetMonthly Leaving method");
 		return eachRow.toString();
 	}
+
 	private String readDataSheetSuppli(Sheet s) throws BiffException, InvalidDataException {
 		log.info("CommonUtil:readDataSheetSuppli Entering method");
 		Cell cell = null;
 		StringBuffer eachRow = new StringBuffer();
-		try {		
-		log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
-		if( s.getColumns()==0 || s.getRows()==0){			
-				throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");			
-		}else if(s.getRows()<=11){
-			throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
-		}
-		String delimiter = "*", cellContent = "",cellCont="";
-		String sss="";	
-		for (int j = 10; j < s.getRows(); j++) {
-			for (int i = 0; i < s.getColumns(); i++) {
-				cell = s.getCell(i, j);	
-				if(j>=11){
-					if(i==0 || i==1){
-						if(cell.getContents().trim().equals("") || cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")){
-							throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+		try {
+			log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
+			if (s.getColumns() == 0 || s.getRows() == 0) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");
+			} else if (s.getRows() <= 11) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
+			}
+			String delimiter = "*", cellContent = "", cellCont = "";
+			String sss = "";
+			for (int j = 10; j < s.getRows(); j++) {
+				for (int i = 0; i < s.getColumns(); i++) {
+					cell = s.getCell(i, j);
+					if (j >= 11) {
+						if (i == 0 || i == 1) {
+							if (cell.getContents().trim().equals("") || cell.getContents().trim().equals("0")
+									|| cell.getContents().equals("0.00")) {
+								throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "
+										+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+						}
+						if (i == 9 || i == 10) {
+							log.info("inside method" + cell.getContents());
+							if (cell.getContents().trim().equals("")) {
+								throw new InvalidDataException(
+										"Sorry...! Field cannot be empty Please enter the valid data (Excepting only Numeric Values) exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+							if (cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")) {
+								throw new InvalidDataException(
+										"Sorry...! Value cannot be Zero Please enter the valid data in exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
 						}
 					}
-				if(i==9 || i==10){
-					log.info("inside method"+cell.getContents());
-					if(cell.getContents().trim().equals("")){
-						throw new InvalidDataException("Sorry...! Field cannot be empty Please enter the valid data (Excepting only Numeric Values) exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
-					}
-					if(cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")){
-						throw new InvalidDataException("Sorry...! Value cannot be Zero Please enter the valid data in exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
-					}
-				}
-				}
-				if (!cell.getContents().trim().equals("")) {					
-					if(j>=11){	
-					if(i>=9 && i<=17){
-						cellCont = StringUtility.replace(
-								cell.getContents().toCharArray(),
-								delimiter.toCharArray(), "").toString();
-							double cellvalue=Double.parseDouble(cellCont);
-                           }
-					}
-				}
-				if (!cell.getContents().trim().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();					
-			    //new code added  for invalid data,i.e,validation for special characters
-					if(cell.getType()==CellType.NUMBER){
-					if(cellContent.indexOf("(")!=-1 || cellContent.indexOf(")")!=-1 ||cellContent.indexOf("}")!=-1 || cellContent.indexOf("{")!=-1 || cellContent.indexOf("*")!=-1){
-							throw new InvalidDataException("The invalid data '"+cell.getContents()+"' exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+					if (!cell.getContents().trim().equals("")) {
+						if (j >= 11) {
+							if (i >= 9 && i <= 17) {
+								cellCont = StringUtility
+										.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "")
+										.toString();
+								double cellvalue = Double.parseDouble(cellCont);
+							}
 						}
-					}					
-					//log.info("Test cellContent:"+cellContent);
-					if (!cellContent.trim().equals("")) {
-						eachRow.append(cell.getContents() + "@");
+					}
+					if (!cell.getContents().trim().equals("")) {
+						cellContent = StringUtility
+								.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "").toString();
+						// new code added for invalid data,i.e,validation for special characters
+						if (cell.getType() == CellType.NUMBER) {
+							if (cellContent.indexOf("(") != -1 || cellContent.indexOf(")") != -1
+									|| cellContent.indexOf("}") != -1 || cellContent.indexOf("{") != -1
+									|| cellContent.indexOf("*") != -1) {
+								throw new InvalidDataException(
+										"The invalid data '" + cell.getContents() + "' exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+						}
+						// log.info("Test cellContent:"+cellContent);
+						if (!cellContent.trim().equals("")) {
+							eachRow.append(cell.getContents() + "@");
+						} else {
+							eachRow.append("XXX" + "@");
+						}
 					} else {
 						eachRow.append("XXX" + "@");
 					}
-				} else {
-					eachRow.append("XXX" + "@");
 				}
+				eachRow.append("***");
 			}
-			eachRow.append("***");
-		} } catch (InvalidDataException e) {
+		} catch (InvalidDataException e) {
 			// TODO Auto-generated catch block
 			throw e;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			log.info(e.toString());
-			String msg="";
-			String txt=e.toString();
-			if(txt.indexOf("java.lang.ArrayIndexOutOfBoundsException")!=-1){
-			 msg="Please Enter Valid Data ( Excepting only Numeric Values)";	
+			String msg = "";
+			String txt = e.toString();
+			if (txt.indexOf("java.lang.ArrayIndexOutOfBoundsException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values)";
 			}
-			if(txt.indexOf("java.lang.NullPointerException")!=-1){
-				 msg="sorry....! Row cannot be blank Please Enter Valid Data in row:"+s.getRows()+1+"";	
-				}
-			if(txt.indexOf("java.lang.NumberFormatException")!=-1){
-				 msg="Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:"+s.getRows()+" and columns :"+s.getColumns()+" )";	
-				}
-			
-	throw new InvalidDataException(msg +""+e.getMessage());
+			if (txt.indexOf("java.lang.NullPointerException") != -1) {
+				msg = "sorry....! Row cannot be blank Please Enter Valid Data in row:" + s.getRows() + 1 + "";
+			}
+			if (txt.indexOf("java.lang.NumberFormatException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:" + s.getRows()
+						+ " and columns :" + s.getColumns() + " )";
+			}
+
+			throw new InvalidDataException(msg + "" + e.getMessage());
 		}
 		log.info("CommonUtil:readDataSheetSuppli Leaving method");
 		return eachRow.toString();
 	}
+
 	private String readDataSheetArrear(Sheet s) throws BiffException, InvalidDataException {
 		log.info("CommonUtil:readDataSheetArrear Entering method");
 		Cell cell = null;
 		StringBuffer eachRow = new StringBuffer();
-		try {		
-		log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
-		if( s.getColumns()==0 || s.getRows()==0){			
-				throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");			
-		}else if(s.getRows()<=11){
-			throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
-		}
-		String delimiter = "*", cellContent = "",cellCont="";
-		String sss="";	
-		for (int j = 10; j < s.getRows(); j++) {
-			for (int i = 0; i < s.getColumns(); i++) {
-				cell = s.getCell(i, j);	
-				if(j>=11){
-					if(i==0 || i==1){
-						if(cell.getContents().trim().equals("") || cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")){
-							throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+		try {
+			log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
+			if (s.getColumns() == 0 || s.getRows() == 0) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");
+			} else if (s.getRows() <= 11) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
+			}
+			String delimiter = "*", cellContent = "", cellCont = "";
+			String sss = "";
+			for (int j = 10; j < s.getRows(); j++) {
+				for (int i = 0; i < s.getColumns(); i++) {
+					cell = s.getCell(i, j);
+					if (j >= 11) {
+						if (i == 0 || i == 1) {
+							if (cell.getContents().trim().equals("") || cell.getContents().trim().equals("0")
+									|| cell.getContents().equals("0.00")) {
+								throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "
+										+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+						}
+						if (i == 9 || i == 10) {
+							log.info("inside method" + cell.getContents());
+							if (cell.getContents().trim().equals("")) {
+								throw new InvalidDataException(
+										"Sorry...! Field cannot be empty Please enter the valid data (Excepting only Numeric Values) exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+							if (cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")) {
+								throw new InvalidDataException(
+										"Sorry...! Value cannot be Zero Please enter the valid data in exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
 						}
 					}
-				if(i==9 || i==10){
-					log.info("inside method"+cell.getContents());
-					if(cell.getContents().trim().equals("")){
-						throw new InvalidDataException("Sorry...! Field cannot be empty Please enter the valid data (Excepting only Numeric Values) exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
-					}
-					if(cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")){
-						throw new InvalidDataException("Sorry...! Value cannot be Zero Please enter the valid data in exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
-					}
-				}
-				}
-				if (!cell.getContents().trim().equals("")) {					
-					if(j>=11){	
-					if(i>=9 && i<=17){
-						cellCont = StringUtility.replace(
-								cell.getContents().toCharArray(),
-								delimiter.toCharArray(), "").toString();
-							double cellvalue=Double.parseDouble(cellCont);
-                           }
-					}
-				}
-				if (!cell.getContents().trim().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();					
-			    //new code added  for invalid data,i.e,validation for special characters
-					if(cell.getType()==CellType.NUMBER){
-					if(cellContent.indexOf("(")!=-1 || cellContent.indexOf(")")!=-1 ||cellContent.indexOf("}")!=-1 || cellContent.indexOf("{")!=-1 || cellContent.indexOf("*")!=-1){
-							throw new InvalidDataException("The invalid data '"+cell.getContents()+"' exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+					if (!cell.getContents().trim().equals("")) {
+						if (j >= 11) {
+							if (i >= 9 && i <= 17) {
+								cellCont = StringUtility
+										.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "")
+										.toString();
+								double cellvalue = Double.parseDouble(cellCont);
+							}
 						}
-					}					
-					//log.info("Test cellContent:"+cellContent);
-					if (!cellContent.trim().equals("")) {
-						eachRow.append(cell.getContents() + "@");
+					}
+					if (!cell.getContents().trim().equals("")) {
+						cellContent = StringUtility
+								.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "").toString();
+						// new code added for invalid data,i.e,validation for special characters
+						if (cell.getType() == CellType.NUMBER) {
+							if (cellContent.indexOf("(") != -1 || cellContent.indexOf(")") != -1
+									|| cellContent.indexOf("}") != -1 || cellContent.indexOf("{") != -1
+									|| cellContent.indexOf("*") != -1) {
+								throw new InvalidDataException(
+										"The invalid data '" + cell.getContents() + "' exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+						}
+						// log.info("Test cellContent:"+cellContent);
+						if (!cellContent.trim().equals("")) {
+							eachRow.append(cell.getContents() + "@");
+						} else {
+							eachRow.append("XXX" + "@");
+						}
 					} else {
 						eachRow.append("XXX" + "@");
 					}
-				} else {
-					eachRow.append("XXX" + "@");
 				}
+				eachRow.append("***");
 			}
-			eachRow.append("***");
-		} } catch (InvalidDataException e) {
+		} catch (InvalidDataException e) {
 			// TODO Auto-generated catch block
 			throw e;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			log.info(e.toString());
-			String msg="";
-			String txt=e.toString();
-			if(txt.indexOf("java.lang.ArrayIndexOutOfBoundsException")!=-1){
-			 msg="Please Enter Valid Data ( Excepting only Numeric Values)";	
+			String msg = "";
+			String txt = e.toString();
+			if (txt.indexOf("java.lang.ArrayIndexOutOfBoundsException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values)";
 			}
-			if(txt.indexOf("java.lang.NullPointerException")!=-1){
-				 msg="sorry....! Row cannot be blank Please Enter Valid Data in row:"+s.getRows()+1+"";	
-				}
-			if(txt.indexOf("java.lang.NumberFormatException")!=-1){
-				 msg="Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:"+s.getRows()+" and columns :"+s.getColumns()+" )";	
-				}
-			
-	throw new InvalidDataException(msg +""+e.getMessage());
+			if (txt.indexOf("java.lang.NullPointerException") != -1) {
+				msg = "sorry....! Row cannot be blank Please Enter Valid Data in row:" + s.getRows() + 1 + "";
+			}
+			if (txt.indexOf("java.lang.NumberFormatException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:" + s.getRows()
+						+ " and columns :" + s.getColumns() + " )";
+			}
+
+			throw new InvalidDataException(msg + "" + e.getMessage());
 		}
 		log.info("CommonUtil:readDataSheetArrear Leaving method");
 		return eachRow.toString();
 	}
+
 	private String readDataSheet4single(Sheet s) throws BiffException, InvalidDataException {
 		log.info("CommonUtil:readDataSheet4 Entering method");
 		Cell cell = null;
 		StringBuffer eachRow = new StringBuffer();
-		try {		
-		log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
-		if( s.getColumns()==0 || s.getRows()==0){			
-				throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");			
-		}else if(s.getRows()<=11){
-			throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
-		}
-		String delimiter = "*", cellContent = "",cellCont="";
-		String sss="";
-		for (int j = 10; j < s.getRows(); j++) {
-			for (int i = 0; i < s.getColumns(); i++) {
-				cell = s.getCell(i, j);	
-				if(j>=11){
-					if(i==0 || i==1){
-						if(cell.getContents().trim().equals("") || cell.getContents().trim().equals("0") || cell.getContents().equals("0.00")){
-							throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+		try {
+			log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
+			if (s.getColumns() == 0 || s.getRows() == 0) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet");
+			} else if (s.getRows() <= 11) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Data in Standard Format Sheet and Data must be from 12th Row onwards");
+			}
+			String delimiter = "*", cellContent = "", cellCont = "";
+			String sss = "";
+			for (int j = 10; j < s.getRows(); j++) {
+				for (int i = 0; i < s.getColumns(); i++) {
+					cell = s.getCell(i, j);
+					if (j >= 11) {
+						if (i == 0 || i == 1) {
+							if (cell.getContents().trim().equals("") || cell.getContents().trim().equals("0")
+									|| cell.getContents().equals("0.00")) {
+								throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "
+										+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
 						}
-					}				
-				}
-				if (!cell.getContents().trim().equals("")) {					
-					if(j>=11){	
-					if(i>=9 && i<=17){
-						cellCont = StringUtility.replace(
-								cell.getContents().toCharArray(),
-								delimiter.toCharArray(), "").toString();
-							double cellvalue=Double.parseDouble(cellCont);
-                           }
 					}
-				}
-				if (!cell.getContents().trim().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();					
-			    //new code added  for invalid data,i.e,validation for special characters
-					if(cell.getType()==CellType.NUMBER){
-					if(cellContent.indexOf("(")!=-1 || cellContent.indexOf(")")!=-1 ||cellContent.indexOf("}")!=-1 || cellContent.indexOf("{")!=-1 || cellContent.indexOf("*")!=-1){
-							throw new InvalidDataException("The invalid data '"+cell.getContents()+"' exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+					if (!cell.getContents().trim().equals("")) {
+						if (j >= 11) {
+							if (i >= 9 && i <= 17) {
+								cellCont = StringUtility
+										.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "")
+										.toString();
+								double cellvalue = Double.parseDouble(cellCont);
+							}
 						}
-					}					
-					//log.info("Test cellContent:"+cellContent);
-					if (!cellContent.trim().equals("")) {
-						eachRow.append(cell.getContents() + "@");
+					}
+					if (!cell.getContents().trim().equals("")) {
+						cellContent = StringUtility
+								.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "").toString();
+						// new code added for invalid data,i.e,validation for special characters
+						if (cell.getType() == CellType.NUMBER) {
+							if (cellContent.indexOf("(") != -1 || cellContent.indexOf(")") != -1
+									|| cellContent.indexOf("}") != -1 || cellContent.indexOf("{") != -1
+									|| cellContent.indexOf("*") != -1) {
+								throw new InvalidDataException(
+										"The invalid data '" + cell.getContents() + "' exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
+						}
+						// log.info("Test cellContent:"+cellContent);
+						if (!cellContent.trim().equals("")) {
+							eachRow.append(cell.getContents() + "@");
+						} else {
+							eachRow.append("XXX" + "@");
+						}
 					} else {
 						eachRow.append("XXX" + "@");
 					}
-				} else {
-					eachRow.append("XXX" + "@");
 				}
+				eachRow.append("***");
 			}
-			eachRow.append("***");
-		} } catch (InvalidDataException e) {
+		} catch (InvalidDataException e) {
 			// TODO Auto-generated catch block
 			throw e;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			log.info(e.toString());
-			String msg="";
-			String txt=e.toString();
-			if(txt.indexOf("java.lang.ArrayIndexOutOfBoundsException")!=-1){
-			 msg="Please Enter Valid Data ( Excepting only Numeric Values)";	
+			String msg = "";
+			String txt = e.toString();
+			if (txt.indexOf("java.lang.ArrayIndexOutOfBoundsException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values)";
 			}
-			if(txt.indexOf("java.lang.NullPointerException")!=-1){
-				 msg="sorry....! Row cannot be blank Please Enter Valid Data in row:"+s.getRows()+1+"";	
-				}
-			if(txt.indexOf("java.lang.NumberFormatException")!=-1){
-				 msg="Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:"+s.getRows()+" and columns :"+s.getColumns()+" )";	
-				}			
-	throw new InvalidDataException(msg +""+e.getMessage());		
-	 
+			if (txt.indexOf("java.lang.NullPointerException") != -1) {
+				msg = "sorry....! Row cannot be blank Please Enter Valid Data in row:" + s.getRows() + 1 + "";
+			}
+			if (txt.indexOf("java.lang.NumberFormatException") != -1) {
+				msg = "Please Enter Valid Data ( Excepting only Numeric Values in the sheet in the row:" + s.getRows()
+						+ " and columns :" + s.getColumns() + " )";
+			}
+			throw new InvalidDataException(msg + "" + e.getMessage());
+
 		}
 		log.info("CommonUtil:readDataSheet4 Leaving method");
 		return eachRow.toString();
 	}
-	private String readDataSheet2(Sheet s, String fileName) throws BiffException, InvalidDataException  {
+
+	private String readDataSheet2(Sheet s, String fileName) throws BiffException, InvalidDataException {
+		
 		log.info("CommonUtil:readDataSheet2 Entering method");
 		Cell cell = null;
 		StringBuffer eachRow = new StringBuffer();
 		log.info("Columns" + s.getColumns() + "Rows" + s.getRows());
 		String delimiter = "*", cellContent = "";
 		try {
-			if( s.getColumns()==0 || s.getRows()==0){			
-				throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Advances/PFW/FinalSettlement Data in AAI EPF8 Sheet");			
-		}
-		int jvalue = 0;
-		if (fileName.indexOf("AAIEPF-8") != -1) {
-			jvalue = 9;
-			if(s.getRows()<=10){
-				throw new InvalidDataException("You can't upload the Blank Excel Sheet,Need to Have Advances/PFW/FinalSettlement Data in AAI EPF8 Sheet and Data must be from 11th Row onwards");
+			if (s.getColumns() == 0 || s.getRows() == 0) {
+				throw new InvalidDataException(
+						"You can't upload the Blank Excel Sheet,Need to Have Advances/PFW/FinalSettlement Data in AAI EPF8 Sheet");
 			}
-		} else if (fileName.indexOf("ARREARBREAKUP_") != -1) {
-			jvalue = 1;
-		} else {
-			jvalue = 7;
-		}
+			int jvalue = 0;
+			if (fileName.indexOf("AAIEPF-8") != -1) {
+				jvalue = 9;
+				if (s.getRows() <= 10) {
+					throw new InvalidDataException(
+							"You can't upload the Blank Excel Sheet,Need to Have Advances/PFW/FinalSettlement Data in AAI EPF8 Sheet and Data must be from 11th Row onwards");
+				}
+			} else if (fileName.indexOf("ARREARBREAKUP_") != -1) {
+				jvalue = 1;
+			} else {
+				jvalue = 7;
+			}
 
-		for (int j = jvalue; j < s.getRows(); j++) {
-			for (int i = 0; i < s.getColumns(); i++) {
-				cell = s.getCell(i, j);
-				if (!cell.getContents().trim().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();
-//					new code added  for invalid data,i.e,validation for special characters
-					if(cell.getType()==CellType.NUMBER){
-					if(cellContent.indexOf("(")!=-1 || cellContent.indexOf(")")!=-1 ||cellContent.indexOf("}")!=-1 || cellContent.indexOf("{")!=-1 || cellContent.indexOf("*")!=-1){
-							throw new InvalidDataException("The invalid data '"+cell.getContents()+"' exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1)+"");
+			for (int j = jvalue; j < s.getRows(); j++) {
+				for (int i = 0; i < s.getColumns(); i++) {
+					cell = s.getCell(i, j);
+					if (!cell.getContents().trim().equals("")) {
+						cellContent = StringUtility
+								.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "").toString();
+						// new code added for invalid data,i.e,validation for special characters
+						if (cell.getType() == CellType.NUMBER) {
+							if (cellContent.indexOf("(") != -1 || cellContent.indexOf(")") != -1
+									|| cellContent.indexOf("}") != -1 || cellContent.indexOf("{") != -1
+									|| cellContent.indexOf("*") != -1) {
+								throw new InvalidDataException(
+										"The invalid data '" + cell.getContents() + "' exist in Row: "
+												+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1) + "");
+							}
 						}
-					}
-					if (!cellContent.trim().equals("")) {
-						eachRow.append(cell.getContents() + "@");
+						if (!cellContent.trim().equals("")) {
+							eachRow.append(cell.getContents() + "@");
+						} else {
+							eachRow.append("XXX" + "@");
+						}
+
 					} else {
 						eachRow.append("XXX" + "@");
 					}
 
-				} else {
-					eachRow.append("XXX" + "@");
 				}
-
+				eachRow.append("***");
 			}
-			eachRow.append("***");
-		} } catch (InvalidDataException e) {
+		} catch (InvalidDataException e) {
 			// TODO Auto-generated catch block
 			throw e;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		log.info("CommonUtil:readDataSheet2 Leaving method");
 		return eachRow.toString();
 	}
+
 	public ArrayList getTheList(String tableList, String delimeter) {
 		// log.info("CommonUtil:getTheList Entering method");
 		ArrayList tblList = new ArrayList();
@@ -792,6 +975,7 @@ public String createFile(String filename,String extension,String data){
 		// log.info("CommonUtil:getTheList Leaving method");
 		return tblList;
 	}
+
 	public String escapeSingleQuotes(String strToEscape) {
 		if (strToEscape.indexOf('\'') == -1)
 			return strToEscape;
@@ -823,12 +1007,9 @@ public String createFile(String filename,String extension,String data){
 				file.createNewFile();
 			}
 			System.out.println("File Existed");
-			BufferedWriter out = new BufferedWriter(new FileWriter(fileName,
-					true));
-			String format = "\r\n"
-					+ this
-							.getDateTime(Constants.APPLICATION_DATE_TIME_FORMAT_HYPEN)
-					+ ">> " + className + ">> " + message;
+			BufferedWriter out = new BufferedWriter(new FileWriter(fileName, true));
+			String format = "\r\n" + this.getDateTime(Constants.APPLICATION_DATE_TIME_FORMAT_HYPEN) + ">> " + className
+					+ ">> " + message;
 			out.write(format);
 			out.close();
 
@@ -844,8 +1025,7 @@ public String createFile(String filename,String extension,String data){
 
 	public String generateFileName(String prefix) {
 		String fileName = "";
-		fileName = prefix + "_"
-				+ this.getDateTime(Constants.APPLICATION_DATE_FORMAT);
+		fileName = prefix + "_" + this.getDateTime(Constants.APPLICATION_DATE_FORMAT);
 		return fileName;
 	}
 
@@ -926,6 +1106,7 @@ public String createFile(String filename,String extension,String data){
 	 */
 	public static void saveFile(InputStream is, String path) throws Exception {
 
+		System.out.println("===========Save File MEthod");
 		try {
 			File saveFilePath = new File(path);
 			if (!saveFilePath.exists()) {
@@ -970,27 +1151,29 @@ public String createFile(String filename,String extension,String data){
 		Map map = new LinkedHashMap();
 		map.put("AAIEPF-3", "AAIEPF-3 (Monthly CPF Recovery)");
 		if (user.trim().equals("navayuga")) {
-		map.put("AAIEPF-3-SUPPL", "AAIEPF-3-SUPPL(Supplimentory Recovery)");
-		map.put("AAIEPF-3A", "AAIEPF-3A (Arrears Recovery)");
-		map.put("AAIEPF-SINGLEVALUE", "AAIEPF-SINGLEVALUE(Supplimentory value Recovery)");
-		map.put("AAIEPF-4", "AAIEPF-4 (CPF Received From Other Org..)");
-		map.put("AAIEPF-8", "AAIEPF-8 (Advances/PFW/FinalSettlement)");
-		}
-		return map;		
-	}
-	public Map getFormsListNavayuga(String user) {
-		log.info(user);
-		Map map = new LinkedHashMap();
-		if (user.trim().equals("navayuga")) {		
-		//map.put("AAIEPF-1", "AAIEPF-1 (Opening Balance)");
-		map.put("AAIEPF-2", "AAIEPF-2 (Adjustment in OpeningBalance)");
-		map.put("AAIEPF-2B", " AAIEPF-2-Batch");	
-		map.put("ARREARBREAKUP_UPLOAD", "ARREARBREAKUP_UPLOAD");
-		map.put("IMP_CALC_UPD","CPFDATA_UPLOAD");
-		map.put("OTHER", "OTHER");
+			map.put("AAIEPF-3-SUPPL", "AAIEPF-3-SUPPL(Supplimentory Recovery)");
+			map.put("AAIEPF-3A", "AAIEPF-3A (Arrears Recovery)");
+			map.put("AAIEPF-SINGLEVALUE", "AAIEPF-SINGLEVALUE(Supplimentory value Recovery)");
+			map.put("AAIEPF-4", "AAIEPF-4 (CPF Received From Other Org..)");
+			map.put("AAIEPF-8", "AAIEPF-8 (Advances/PFW/FinalSettlement)");
 		}
 		return map;
 	}
+
+	public Map getFormsListNavayuga(String user) {
+		log.info(user);
+		Map map = new LinkedHashMap();
+		if (user.trim().equals("navayuga")) {
+			// map.put("AAIEPF-1", "AAIEPF-1 (Opening Balance)");
+			map.put("AAIEPF-2", "AAIEPF-2 (Adjustment in OpeningBalance)");
+			map.put("AAIEPF-2B", " AAIEPF-2-Batch");
+			map.put("ARREARBREAKUP_UPLOAD", "ARREARBREAKUP_UPLOAD");
+			map.put("IMP_CALC_UPD", "CPFDATA_UPLOAD");
+			map.put("OTHER", "OTHER");
+		}
+		return map;
+	}
+
 	public long getDateDifference(String date1, String date2) {
 		long noOfDays = 0;
 		int days = 0;
@@ -1002,15 +1185,14 @@ public String createFile(String filename,String extension,String data){
 			validatDt2 = sdf.parse(date2);
 			noOfDays = (validatDt2.getTime() - validatDt1.getTime());
 			noOfDays = (noOfDays / (1000L * 60L * 60L * 24L * 365));
-			log.info("--" + validatDt2.getTime() + "--" + validatDt1.getTime()
-					+ "--" + noOfDays);
+			log.info("--" + validatDt2.getTime() + "--" + validatDt1.getTime() + "--" + noOfDays);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		return noOfDays;
 	}
-	public String converDBToAppFormat(String dbDate, String fromFormat,
-			String toFormat) throws InvalidDataException {
+
+	public String converDBToAppFormat(String dbDate, String fromFormat, String toFormat) throws InvalidDataException {
 		String convertedDt = "";
 		SimpleDateFormat fromDate = new SimpleDateFormat(fromFormat);
 		SimpleDateFormat toDate = new SimpleDateFormat(toFormat);
@@ -1018,8 +1200,7 @@ public String createFile(String filename,String extension,String data){
 			if (!dbDate.equals("")) {
 				convertedDt = toDate.format(fromDate.parse(dbDate));
 				/*
-				 * log.info("Converted Date is(converDBToAppFormat) " +
-				 * convertedDt);
+				 * log.info("Converted Date is(converDBToAppFormat) " + convertedDt);
 				 */
 			} else {
 				convertedDt = "";
@@ -1040,8 +1221,7 @@ public String createFile(String filename,String extension,String data){
 			if (checkDateFormat(dbDate.toCharArray(), delimeter) == 2) {
 				if (dbDate.indexOf("-") != -1) {
 					int index = dbDate.indexOf("-");
-					month = dbDate
-							.substring(index + 1, dbDate.lastIndexOf("-"));
+					month = dbDate.substring(index + 1, dbDate.lastIndexOf("-"));
 					monthLength = month.length();
 				}
 				if (dbDate.lastIndexOf("-") != -1) {
@@ -1098,20 +1278,16 @@ public String createFile(String filename,String extension,String data){
 		if (checkDelimeters(date.toCharArray()) == true) {
 			if (date.indexOf(',') != -1) {
 				delimiter = ",";
-				date = StringUtility.replace(date.trim().toCharArray(),
-						delimiter.toCharArray(), "").toString();
+				date = StringUtility.replace(date.trim().toCharArray(), delimiter.toCharArray(), "").toString();
 			} else if (date.indexOf('*') != -1) {
 				delimiter = "*";
-				date = StringUtility.replace(date.trim().toCharArray(),
-						delimiter.toCharArray(), "").toString();
+				date = StringUtility.replace(date.trim().toCharArray(), delimiter.toCharArray(), "").toString();
 			} else if (date.indexOf('/') != -1) {
-				date = StringUtility.replace(date.trim().toCharArray(),
-						delimiter.toCharArray(), "-").toString();
+				date = StringUtility.replace(date.trim().toCharArray(), delimiter.toCharArray(), "-").toString();
 			}
 		}
 
-		newDateFormat = StringUtility.replaces(date.trim().toCharArray(),
-				delimiters, "-").toString();
+		newDateFormat = StringUtility.replaces(date.trim().toCharArray(), delimiters, "-").toString();
 		return newDateFormat;
 
 	}
@@ -1229,22 +1405,20 @@ public String createFile(String filename,String extension,String data){
 
 		return hashmap;
 	}
-	
-	public  String getFinYear(String monthYear) throws InvalidDataException{
-		String fromYear="",finYear="",month="";
-		
-		fromYear=this.converDBToAppFormat(monthYear,"dd-MMM-yyyy","yyyy");
-		month=this.converDBToAppFormat(monthYear,"dd-MMM-yyyy","MM");
-		if(Integer.parseInt(month)<=3){
-			finYear=(Integer.parseInt(fromYear)-1)+"-"+fromYear;
-		}else{
-			finYear=fromYear+"-"+(Integer.parseInt(fromYear)+1);	
+
+	public String getFinYear(String monthYear) throws InvalidDataException {
+		String fromYear = "", finYear = "", month = "";
+
+		fromYear = this.converDBToAppFormat(monthYear, "dd-MMM-yyyy", "yyyy");
+		month = this.converDBToAppFormat(monthYear, "dd-MMM-yyyy", "MM");
+		if (Integer.parseInt(month) <= 3) {
+			finYear = (Integer.parseInt(fromYear) - 1) + "-" + fromYear;
+		} else {
+			finYear = fromYear + "-" + (Integer.parseInt(fromYear) + 1);
 		}
-		
+
 		return finYear;
 	}
-	
-	
 
 	private String validateAlphabetic(char[] frmtDt) {
 		StringBuffer buff = new StringBuffer();
@@ -1308,8 +1482,7 @@ public String createFile(String filename,String extension,String data){
 
 		}
 		String employeeName = buff.toString();
-		System.out.println("validateAlphaNumber=Before=(validDt)="
-				+ employeeName);
+		System.out.println("validateAlphaNumber=Before=(validDt)=" + employeeName);
 		// System.out.println("validateAlphaNumber==="+validDate);
 		return employeeName;
 	}
@@ -1332,8 +1505,7 @@ public String createFile(String filename,String extension,String data){
 		return date;
 	}
 
-	public String replaceAllWords2(String original, String find,
-			String replacement) {
+	public String replaceAllWords2(String original, String find, String replacement) {
 		StringBuffer result = new StringBuffer(original.length());
 
 		StringTokenizer st = new StringTokenizer(original);
@@ -1382,8 +1554,8 @@ public String createFile(String filename,String extension,String data){
 		try {
 			con = commonDB.getConnection();
 			st = con.createStatement();
-			String query = "SELECT distinct AIRPORTCODE  FROM mv_employee_pension_airports where region='"
-					+ region + "'";
+			String query = "SELECT distinct AIRPORTCODE  FROM mv_employee_pension_airports where region='" + region
+					+ "'";
 			log.info("getAirportsByFinanceTbl==query===========" + query);
 			rs = st.executeQuery(query);
 			while (rs.next()) {
@@ -1418,8 +1590,8 @@ public String createFile(String filename,String extension,String data){
 		try {
 			con = commonDB.getConnection();
 			Statement st = con.createStatement();
-			String sql = "select * from employee_unit_master where region in ('"
-					+ region + "','CHQIAD') order by region";
+			String sql = "select * from employee_unit_master where region in ('" + region
+					+ "','CHQIAD') order by region";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				EmpMasterBean bean = new EmpMasterBean();
@@ -1431,8 +1603,7 @@ public String createFile(String filename,String extension,String data){
 					bean.setStation("");
 				}
 				if (!unitName.equals("")) {
-					bean.setStationWithRegion(unitName.toUpperCase() + " - "
-							+ rs.getString("region"));
+					bean.setStationWithRegion(unitName.toUpperCase() + " - " + rs.getString("region"));
 				} else {
 					bean.setStationWithRegion("");
 				}
@@ -1456,12 +1627,13 @@ public String createFile(String filename,String extension,String data){
 		}
 		return airportList;
 	}
-	public ArrayList getModuleList(){
+
+	public ArrayList getModuleList() {
 		Connection con = null;
 		Statement st = null;
 		ArrayList userList = new ArrayList();
 		ResultSet rs = null;
-		String modulecode = "",modulename="";
+		String modulecode = "", modulename = "";
 		try {
 			con = commonDB.getConnection();
 			st = con.createStatement();
@@ -1490,7 +1662,8 @@ public String createFile(String filename,String extension,String data){
 		}
 		return userList;
 	}
-	public ArrayList getUserList(){
+
+	public ArrayList getUserList() {
 		Connection con = null;
 		Statement st = null;
 		ArrayList userList = new ArrayList();
@@ -1556,29 +1729,27 @@ public String createFile(String filename,String extension,String data){
 
 	/*
 	 * public static Date getStringtoDate(String dt) {
-	 * log.info("CommonUtil:getStringtoDate-- Entering Method");
-	 * SimpleDateFormat from = new SimpleDateFormat("dd/MMM/yyyy");
-	 * SimpleDateFormat to = new SimpleDateFormat("yyyy-MM-dd"); String str =
-	 * ""; Date date = null; try { str = to.format(from.parse("01/07/06")); date =
-	 * Date.parse(str); log.info("----" + date); } catch (ParseException e) {
-	 * e.printStackTrace(); } log.info("CommonUtil:getStringtoDate-- Leaving
-	 * Method"); return date; }
+	 * log.info("CommonUtil:getStringtoDate-- Entering Method"); SimpleDateFormat
+	 * from = new SimpleDateFormat("dd/MMM/yyyy"); SimpleDateFormat to = new
+	 * SimpleDateFormat("yyyy-MM-dd"); String str = ""; Date date = null; try { str
+	 * = to.format(from.parse("01/07/06")); date = Date.parse(str); log.info("----"
+	 * + date); } catch (ParseException e) { e.printStackTrace(); }
+	 * log.info("CommonUtil:getStringtoDate-- Leaving Method"); return date; }
 	 */
 
 	/*
 	 * public static String getDatetoString(Date dt,String format) {
 	 * //log.info("CommonUtil:getDatetoString-- Entering Method"); //
-	 * SimpleDateFormat from = new SimpleDateFormat("yyyy-MM-dd");
-	 * SimpleDateFormat to = new SimpleDateFormat(format); String convertDate =
-	 * ""; convertDate = to.format(dt); // log.info("Date is" + convertDate);
+	 * SimpleDateFormat from = new SimpleDateFormat("yyyy-MM-dd"); SimpleDateFormat
+	 * to = new SimpleDateFormat(format); String convertDate = ""; convertDate =
+	 * to.format(dt); // log.info("Date is" + convertDate);
 	 * 
 	 * //log.info("CommonUtil:getDatetoString-- Leaving Method"); return
 	 * convertDate; } public static String getDatetoString1(Date dt) {
 	 * //log.info("CommonUtil:getDatetoString-- Entering Method"); //
-	 * SimpleDateFormat from = new SimpleDateFormat("yyyy-MM-dd");
-	 * SimpleDateFormat to = new SimpleDateFormat("dd/MMM/yy"); String
-	 * convertDate = ""; convertDate = to.format(dt); log.info("Date is" +
-	 * convertDate);
+	 * SimpleDateFormat from = new SimpleDateFormat("yyyy-MM-dd"); SimpleDateFormat
+	 * to = new SimpleDateFormat("dd/MMM/yy"); String convertDate = ""; convertDate
+	 * = to.format(dt); log.info("Date is" + convertDate);
 	 * 
 	 * //log.info("CommonUtil:getDatetoString-- Leaving Method"); return
 	 * convertDate; } public String getDate1(String st) { SimpleDateFormat
@@ -1593,40 +1764,37 @@ public String createFile(String filename,String extension,String data){
 	 * System.out.println("date1=====" + date1); System.out.println("date2=====" +
 	 * date2); } catch (ParseException e) { // TODO Auto-generated catch block
 	 * e.printStackTrace(); } return date2; } public String converFormat(String
-	 * date) { Calendar cal = Calendar.getInstance(); String convertedDt = "";
-	 * try { SimpleDateFormat fromDate = new SimpleDateFormat("yyyyMM"); //
-	 * SimpleDateFormat fromDate = new SimpleDateFormat("mmmmm");
-	 * log.info("date" + date); SimpleDateFormat toDate = new
-	 * SimpleDateFormat("dd-MMM-yy"); convertedDt =
-	 * toDate.format(fromDate.parse(date)); log.info("convertedDt" +
-	 * convertedDt); } catch (ParseException e) { // TODO Auto-generated catch
-	 * block e.printStackTrace(); } return convertedDt; }
+	 * date) { Calendar cal = Calendar.getInstance(); String convertedDt = ""; try {
+	 * SimpleDateFormat fromDate = new SimpleDateFormat("yyyyMM"); //
+	 * SimpleDateFormat fromDate = new SimpleDateFormat("mmmmm"); log.info("date" +
+	 * date); SimpleDateFormat toDate = new SimpleDateFormat("dd-MMM-yy");
+	 * convertedDt = toDate.format(fromDate.parse(date)); log.info("convertedDt" +
+	 * convertedDt); } catch (ParseException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } return convertedDt; }
 	 * 
 	 */
 	/*
-	 * public static String getStringtoDate(String dt) { SimpleDateFormat to =
-	 * new SimpleDateFormat("dd/MMM/yyyy"); SimpleDateFormat from = new
-	 * SimpleDateFormat("yyyy-MM-dd"); String str = ""; java.sql.Date date =
-	 * null; try { str = to.format(from.parse(dt));
+	 * public static String getStringtoDate(String dt) { SimpleDateFormat to = new
+	 * SimpleDateFormat("dd/MMM/yyyy"); SimpleDateFormat from = new
+	 * SimpleDateFormat("yyyy-MM-dd"); String str = ""; java.sql.Date date = null;
+	 * try { str = to.format(from.parse(dt));
 	 * 
 	 * System.out.println("----" + str); } catch (ParseException e) { str = dt;
 	 * e.printStackTrace(); } return str; }
 	 * 
-	 * public String converteFormToDateFormat(String date, String format) {
-	 * String convertedDTFormat = ""; SimpleDateFormat from = new
+	 * public String converteFormToDateFormat(String date, String format) { String
+	 * convertedDTFormat = ""; SimpleDateFormat from = new
 	 * SimpleDateFormat("yyyy-MM-dd"); SimpleDateFormat to = new
 	 * SimpleDateFormat(format); try { convertedDTFormat =
 	 * to.format(from.parse(date)); } catch (ParseException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); } return
-	 * convertedDTFormat; }
+	 * Auto-generated catch block e.printStackTrace(); } return convertedDTFormat; }
 	 */
 
 	public static String getExceptionMessage(String code) {
 		String msg = "";
 		try {
 			if (code != null)
-				msg = ResourceBundle.getBundle("aims.resources.exceptionCodes")
-						.getString(code.trim());
+				msg = ResourceBundle.getBundle("aims.resources.exceptionCodes").getString(code.trim());
 		} catch (Exception ex) {
 			log.printStackTrace(ex);
 		}
@@ -1649,8 +1817,7 @@ public String createFile(String filename,String extension,String data){
 			rs = st.executeQuery(query);
 			while (rs.next()) {
 				bean = new RegionBean();
-				if (rs.getString("REGIONNAME") != null
-						&& rs.getString("AAICATEGORY") != null) {
+				if (rs.getString("REGIONNAME") != null && rs.getString("AAICATEGORY") != null) {
 					region = rs.getString("REGIONNAME").trim();
 					aaiCategory = rs.getString("AAICATEGORY").trim();
 					if (aaiCategory.equals("METRO AIRPORT")) {
@@ -1662,8 +1829,7 @@ public String createFile(String filename,String extension,String data){
 						bean.setRegion(region);
 					}
 					bean.setAaiCategory(aaiCategory);
-					log.info("Region" + bean.getRegion() + "Airportcode"
-							+ bean.getAirportcode());
+					log.info("Region" + bean.getRegion() + "Airportcode" + bean.getAirportcode());
 
 				}
 				airportList.add(bean);
@@ -1721,8 +1887,7 @@ public String createFile(String filename,String extension,String data){
 				} else {
 					tmpChar = tmpStr.substring(index, index + 1);
 					if (tmpChar.equals(" ") && index < (strLen - 1)) {
-						tmpChar = tmpStr.substring(index + 1, index + 2)
-								.toUpperCase();
+						tmpChar = tmpStr.substring(index + 1, index + 2).toUpperCase();
 						preString = tmpStr.substring(0, index + 1);
 						postString = tmpStr.substring(index + 2, strLen);
 						tmpStr = preString + tmpChar + postString;
@@ -1783,19 +1948,16 @@ public String createFile(String filename,String extension,String data){
 		}
 		String year = datestring[2];
 
-		return this.converDBToAppFormat(day + "-" + month + "-" + year,
-				"dd-MM-yyyy", "dd-MMM-yyyy");
+		return this.converDBToAppFormat(day + "-" + month + "-" + year, "dd-MM-yyyy", "dd-MMM-yyyy");
 
 	}
 
-	static String a1[] = { "Zero", "One", "Two", "Three", "Four", "Five",
-			"Six", "Seven", "Eight", "Nine" };
+	static String a1[] = { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
 
-	static String a2[] = { "", "Ten", "Twenty", "Thirty", "Forty", "Fifty",
-			"Sixty", "Seventy", "Eighty", "Ninety" };
+	static String a2[] = { "", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" };
 
-	static String a3[] = { "", "Eleven", "Twelve", "Thirteen", "Forteen",
-			"Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" };
+	static String a3[] = { "", "Eleven", "Twelve", "Thirteen", "Forteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
+			"Nineteen" };
 
 	static String a4[] = { "", "Hundred", "Thousand", "Lakh", "Crore" };
 
@@ -1825,8 +1987,7 @@ public String createFile(String filename,String extension,String data){
 			n = (int) (n / 100);
 			t = n % 10;
 			if (t != 0)
-				S = GetWords((int) t) + " Hundred "
-						+ (S.trim().equals("") ? "" : "and " + S);
+				S = GetWords((int) t) + " Hundred " + (S.trim().equals("") ? "" : "and " + S);
 
 			n = (int) (n / 10);
 			t = n % 100;
@@ -1846,14 +2007,12 @@ public String createFile(String filename,String extension,String data){
 			n = (int) (n / 100);
 			t = n % 10;
 			if (t != 0)
-				S = GetWords((int) t) + " Hundred "
-						+ (S.indexOf("Crores") > 0 ? S : "Crores" + S);
+				S = GetWords((int) t) + " Hundred " + (S.indexOf("Crores") > 0 ? S : "Crores" + S);
 
 			n = (int) (n / 10);
 			t = n % 100;
 			if (t != 0)
-				S = GetWords((int) t) + " Thousand "
-						+ (S.indexOf("Crores") > 0 ? S : "Crores" + S);
+				S = GetWords((int) t) + " Thousand " + (S.indexOf("Crores") > 0 ? S : "Crores" + S);
 
 			InWords = m.equals("") ? m + " " + S : S;
 		}
@@ -1873,22 +2032,19 @@ public String createFile(String filename,String extension,String data){
 				if (n < 20)
 					GetWords = a3[n % 10].trim();
 				else
-					GetWords = a2[(int) (n / 10)].trim() + " "
-							+ a1[n % 10].trim();
+					GetWords = a2[(int) (n / 10)].trim() + " " + a1[n % 10].trim();
 			}
 		}
 		return (GetWords);
 	}
 
-	public void createSheet(ArrayList finalDataList, String airport,
-			WritableWorkbook workbook, ArrayList hdrsList)
+	public void createSheet(ArrayList finalDataList, String airport, WritableWorkbook workbook, ArrayList hdrsList)
 			throws WriteException {
 		String data = "";
 		log.info("list size is " + finalDataList.size());
 		ArrayList finalDtList = new ArrayList();
 		WritableSheet s = workbook.createSheet(airport, 0);
-		WritableFont wf = new WritableFont(WritableFont.ARIAL, 10,
-				WritableFont.BOLD);
+		WritableFont wf = new WritableFont(WritableFont.ARIAL, 10, WritableFont.BOLD);
 		WritableCellFormat cf = new WritableCellFormat(wf);
 		cf.setWrap(true);
 
@@ -1912,8 +2068,8 @@ public String createFile(String filename,String extension,String data){
 			s.addCell(new Label(2, row, formBean.getEmpName()));
 			/*
 			 * if(isInteger(formBean.getEmployeeNo())==true){ s.addCell(new
-			 * Number(0,row,Double.parseDouble(formBean.getEmployeeNo())));
-			 * }else{ s.addCell(new Label(2,row,formBean.getEmployeeNo())); }
+			 * Number(0,row,Double.parseDouble(formBean.getEmployeeNo()))); }else{
+			 * s.addCell(new Label(2,row,formBean.getEmployeeNo())); }
 			 */
 
 			s.addCell(new Label(3, row, formBean.getDesegnation()));
@@ -1921,7 +2077,7 @@ public String createFile(String filename,String extension,String data){
 			// s.addCell(new Label(5,row,formBean.getEmployeePF()));
 			s.addCell(new Label(4, row, formBean.getPaidDate()));
 			s.addCell(new Label(5, row, formBean.getEmoluments()));
-			s.addCell(new Label(6, row, formBean.getBasic()));		
+			s.addCell(new Label(6, row, formBean.getBasic()));
 			// row++;
 		}
 
@@ -1959,8 +2115,7 @@ public String createFile(String filename,String extension,String data){
 			frmMonthYear = "%" + "-" + month + "-" + year;
 			disMonthYear = month + "-" + year;
 			try {
-				displayDate = this.converDBToAppFormat(disMonthYear, "MM-yyyy",
-						"MMM-yyyy");
+				displayDate = this.converDBToAppFormat(disMonthYear, "MM-yyyy", "MMM-yyyy");
 
 			} catch (InvalidDataException e) {
 				// TODO Auto-generated catch block
@@ -1988,17 +2143,18 @@ public String createFile(String filename,String extension,String data){
 
 		return finalDateFlag;
 	}
-	public boolean compareTwoDatesUsingDB(Connection con,String date1, String date2) {
-		Statement st =null;
-		ResultSet rs =null;
+
+	public boolean compareTwoDatesUsingDB(Connection con, String date1, String date2) {
+		Statement st = null;
+		ResultSet rs = null;
 		boolean finalDateFlag = false;
-		String qry="select 'X' as flag from dual where to_date('"+date1+"')>to_date('"+date2+"')";
+		String qry = "select 'X' as flag from dual where to_date('" + date1 + "')>to_date('" + date2 + "')";
 		log.info(qry);
 		try {
-			st=con.createStatement();
-			rs=st.executeQuery(qry);
-			if(rs.next()){
-				finalDateFlag=true;
+			st = con.createStatement();
+			rs = st.executeQuery(qry);
+			if (rs.next()) {
+				finalDateFlag = true;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -2007,8 +2163,9 @@ public String createFile(String filename,String extension,String data){
 
 		return finalDateFlag;
 	}
-	public String getFromToDates(String fromYear, String toYear,
-			String fromMonth, String toMonth) throws InvalidDataException {
+
+	public String getFromToDates(String fromYear, String toYear, String fromMonth, String toMonth)
+			throws InvalidDataException {
 		String fromDate = "", toDate = "";
 		StringBuffer buffer = new StringBuffer();
 		if (toYear.equals("")) {
@@ -2019,37 +2176,31 @@ public String createFile(String filename,String extension,String data){
 
 			if (!fromMonth.equals("NO-SELECT") && !toMonth.equals("NO-SELECT")) {
 				fromDate = "01-" + fromMonth + "-" + fromYear;
-				if (Integer.parseInt(toMonth) >= 1
-						&& Integer.parseInt(toMonth) <= 3) {
+				if (Integer.parseInt(toMonth) >= 1 && Integer.parseInt(toMonth) <= 3) {
 					fromDate = "01-" + toMonth + "-" + toYear;
 					toDate = "01-" + toMonth + "-" + toYear;
 				} else {
 					toDate = "01-" + toMonth + "-" + fromYear;
 				}
 
-			} else if (fromMonth.equals("NO-SELECT")
-					&& !toMonth.equals("NO-SELECT")) {
+			} else if (fromMonth.equals("NO-SELECT") && !toMonth.equals("NO-SELECT")) {
 				fromDate = "01-04-" + fromYear;
-				if (Integer.parseInt(toMonth) >= 1
-						&& Integer.parseInt(toMonth) <= 3) {
+				if (Integer.parseInt(toMonth) >= 1 && Integer.parseInt(toMonth) <= 3) {
 					fromDate = "01-" + toMonth + "-" + toYear;
 					toDate = "01-" + toMonth + "-" + toYear;
 				} else {
 					toDate = "01-" + toMonth + "-" + fromYear;
 				}
 
-			} else if (!fromMonth.equals("NO-SELECT")
-					&& toMonth.equals("NO-SELECT")) {
+			} else if (!fromMonth.equals("NO-SELECT") && toMonth.equals("NO-SELECT")) {
 				fromDate = "01-" + fromMonth + "-" + fromYear;
-				if (Integer.parseInt(toMonth) >= 1
-						&& Integer.parseInt(toMonth) <= 3) {
+				if (Integer.parseInt(toMonth) >= 1 && Integer.parseInt(toMonth) <= 3) {
 					toDate = "01-" + toMonth + "-" + toYear;
 				} else {
 					toDate = "01-03-" + toYear;
 				}
 
-			} else if (fromMonth.equals("NO-SELECT")
-					&& toMonth.equals("NO-SELECT")) {
+			} else if (fromMonth.equals("NO-SELECT") && toMonth.equals("NO-SELECT")) {
 				fromDate = "01-04-" + fromYear;
 				toDate = "01-03-" + toYear;
 			}
@@ -2058,26 +2209,22 @@ public String createFile(String filename,String extension,String data){
 			fromDate = "01-04-1995";
 			toDate = "01-03-" + this.getCurrentDate("yyyy");
 		}
-		buffer.append(this.converDBToAppFormat(fromDate, "dd-MM-yyyy",
-				"dd-MMM-yyyy"));
+		buffer.append(this.converDBToAppFormat(fromDate, "dd-MM-yyyy", "dd-MMM-yyyy"));
 		buffer.append(",");
-		buffer.append(this.converDBToAppFormat(toDate, "dd-MM-yyyy",
-				"dd-MMM-yyyy"));
+		buffer.append(this.converDBToAppFormat(toDate, "dd-MM-yyyy", "dd-MMM-yyyy"));
 		return buffer.toString();
 	}
 
 	public int GetDaysInMonth(int month, int year) {
 		if (month < 1 || month > 12) {
 			try {
-				throw new InvalidDataException("month" + month
-						+ "month must be between 1 and 12");
+				throw new InvalidDataException("month" + month + "month must be between 1 and 12");
 			} catch (InvalidDataException e) {
 				// TODO Auto-generated catch block
 				log.printStackTrace(e);
 			}
 		}
-		if (1 == month || 3 == month || 5 == month || 7 == month || 8 == month
-				|| 10 == month || 12 == month) {
+		if (1 == month || 3 == month || 5 == month || 7 == month || 8 == month || 10 == month || 12 == month) {
 			return 31;
 		} else if (2 == month) {
 			// Check for leap year
@@ -2127,8 +2274,7 @@ public String createFile(String filename,String extension,String data){
 			con = commonDB.getConnection();
 			st = con.createStatement();
 			String query = "select pensionno,employeename,airportcode,region from employee_personal_info info where pensionno "
-					+ condition
-					+ "  and (pcreportverified='Y' or finalsettlmentdt is not null)";
+					+ condition + "  and (pcreportverified='Y' or finalsettlmentdt is not null)";
 			log.info("==query===========" + query);
 			rs = st.executeQuery(query);
 			while (rs.next()) {
@@ -2166,18 +2312,15 @@ public String createFile(String filename,String extension,String data){
 		String finalWords = "";
 		int point = number.indexOf(".");
 		if (point != -1) {
-			int p = Integer.parseInt(number.substring(point + 1, number
-					.length()));
+			int p = Integer.parseInt(number.substring(point + 1, number.length()));
 			if (p != 0)
 				paisa = " and " + uptoThreeDigit(p) + " Paise ";
 			number = number.substring(0, point);
 		}
 		if (number.length() > 7) {
 			try {
-				croreDigits = Double.parseDouble(number.substring(0, (number
-						.length() - 7)));
-				lakhDigits = Integer.parseInt(number.substring(
-						(number.length() - 7), number.length()));
+				croreDigits = Double.parseDouble(number.substring(0, (number.length() - 7)));
+				lakhDigits = Integer.parseInt(number.substring((number.length() - 7), number.length()));
 			} catch (NumberFormatException nf_ex) {
 				throw nf_ex;
 			}
@@ -2185,8 +2328,7 @@ public String createFile(String filename,String extension,String data){
 			lakhs = aboveThreeUptoSevenDigits(lakhDigits);
 		} else {
 			try {
-				lakhDigits = Integer.parseInt(number.substring(0, number
-						.length()));
+				lakhDigits = Integer.parseInt(number.substring(0, number.length()));
 				if (lakhDigits == 0)
 					return "Zero Rupees Only";
 			} catch (NumberFormatException nf_ex) {
@@ -2209,18 +2351,15 @@ public String createFile(String filename,String extension,String data){
 		String finalWords = "";
 		int point = number.indexOf(".");
 		if (point != -1) {
-			int p = Integer.parseInt(number.substring(point + 1, number
-					.length()));
+			int p = Integer.parseInt(number.substring(point + 1, number.length()));
 			if (p != 0)
 				paisa = " and Paise " + uptoThreeDigit(p);
 			number = number.substring(0, point);
 		}
 		if (number.length() > 7) {
 			try {
-				croreDigits = Double.parseDouble(number.substring(0, (number
-						.length() - 7)));
-				lakhDigits = Integer.parseInt(number.substring(
-						(number.length() - 7), number.length()));
+				croreDigits = Double.parseDouble(number.substring(0, (number.length() - 7)));
+				lakhDigits = Integer.parseInt(number.substring((number.length() - 7), number.length()));
 			} catch (NumberFormatException nf_ex) {
 				throw nf_ex;
 			}
@@ -2228,8 +2367,7 @@ public String createFile(String filename,String extension,String data){
 			lakhs = aboveThreeUptoSevenDigits(lakhDigits);
 		} else {
 			try {
-				lakhDigits = Integer.parseInt(number.substring(0, number
-						.length()));
+				lakhDigits = Integer.parseInt(number.substring(0, number.length()));
 				if (lakhDigits == 0)
 					return "Rupees Zero Only";
 			} catch (NumberFormatException nf_ex) {
@@ -2237,8 +2375,7 @@ public String createFile(String filename,String extension,String data){
 			}
 			lakhs = aboveThreeUptoSevenDigits(lakhDigits);
 		}
-		finalWords = (("Rupees " + crores + lakhs + "" + paisa + " Only")
-				.trim());
+		finalWords = (("Rupees " + crores + lakhs + "" + paisa + " Only").trim());
 		return finalWords;
 	}
 
@@ -2273,8 +2410,7 @@ public String createFile(String filename,String extension,String data){
 		return words;
 	}
 
-	public static long getDifferenceTwoDatesInDays(String retirmentDt,
-			String currentDate) {
+	public static long getDifferenceTwoDatesInDays(String retirmentDt, String currentDate) {
 		DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 		long days = 0;
 		try {
@@ -2315,9 +2451,7 @@ public String createFile(String filename,String extension,String data){
 		 * If file is a directory, return
 		 */
 		if (isDirectory) {
-			System.out
-					.println("The parameter you have provided is a directory: "
-							+ oldFileName);
+			System.out.println("The parameter you have provided is a directory: " + oldFileName);
 			System.out.println("Rename Operation Aborted.");
 			return;
 		}
@@ -2330,24 +2464,23 @@ public String createFile(String filename,String extension,String data){
 			System.out.println("Original File Name: " + oldFileName);
 			System.out.println("Rename File Name: " + newFileName);
 		} else {
-			System.out
-					.println("Error occurred while trying to rename the file.");
+			System.out.println("Error occurred while trying to rename the file.");
 		}
 
 	}
 
 	/*
 	 * public List getExtractClobDataList(List extractData) throws
-	 * FileNotFoundException { AdjExtractData extractBean = new
-	 * AdjExtractData(); List outExtractList=new LinkedList(); InputStream
-	 * clobOutputStream = null; byte[] byteBuffer; int bytesRead = 0,
-	 * totBytesRead = 0, totBytesWritten = 0,bufferSize = 0; String
-	 * filename,calculsheetfolder,form2sheetfolder; ResourceBundle bundle=
+	 * FileNotFoundException { AdjExtractData extractBean = new AdjExtractData();
+	 * List outExtractList=new LinkedList(); InputStream clobOutputStream = null;
+	 * byte[] byteBuffer; int bytesRead = 0, totBytesRead = 0, totBytesWritten =
+	 * 0,bufferSize = 0; String filename,calculsheetfolder,form2sheetfolder;
+	 * ResourceBundle bundle=
 	 * ResourceBundle.getBundle("aims.resource.ApplicationResouces");
 	 * calculsheetfolder=bundle.getString("upload.folder.path.epf.cal");
 	 * form2sheetfolder=bundle.getString("upload.folder.path.epf.form2");
-	 * FileOutputStream fstream = null; for (int i = 0; i < extractData.size();
-	 * i++) { extractBean = (AdjExtractData) extractData.get(i);
+	 * FileOutputStream fstream = null; for (int i = 0; i < extractData.size(); i++)
+	 * { extractBean = (AdjExtractData) extractData.get(i);
 	 * if(extractBean.getSheettype().equals("AAIEPF2_REC")){
 	 * filename=form2sheetfolder+"\\"+extractBean.getSheetname(); }else{
 	 * filename=calculsheetfolder+"\\"+extractBean.getSheetname(); }
@@ -2355,20 +2488,19 @@ public String createFile(String filename,String extension,String data){
 	 * extractBean.getXlsdocument().getBufferSize(); byteBuffer = new
 	 * byte[bufferSize]; clobOutputStream = extractBean.getXlsdocument()
 	 * .getAsciiStream(); fstream = new FileOutputStream(filename); while
-	 * ((bytesRead = clobOutputStream.read(byteBuffer)) != -1) { // After
-	 * reading a buffer from the text file, write the contents // of the buffer
-	 * to the output stream using the write() // method.
+	 * ((bytesRead = clobOutputStream.read(byteBuffer)) != -1) { // After reading a
+	 * buffer from the text file, write the contents // of the buffer to the output
+	 * stream using the write() // method.
 	 * 
 	 * fstream.write(byteBuffer, 0, bytesRead); totBytesRead += bytesRead;
-	 * totBytesWritten += bytesRead; } clobOutputStream.close();
-	 * fstream.close(); byteBuffer = null; bytesRead = 0; totBytesRead = 0;
-	 * totBytesWritten = 0; outExtractList.add(filename); } catch (SQLException
-	 * e) { // TODO Auto-generated catch block log.printStackTrace(e); } catch
-	 * (IOException e) { // TODO Auto-generated catch block
-	 * log.printStackTrace(e); } } return outExtractList; }
+	 * totBytesWritten += bytesRead; } clobOutputStream.close(); fstream.close();
+	 * byteBuffer = null; bytesRead = 0; totBytesRead = 0; totBytesWritten = 0;
+	 * outExtractList.add(filename); } catch (SQLException e) { // TODO
+	 * Auto-generated catch block log.printStackTrace(e); } catch (IOException e) {
+	 * // TODO Auto-generated catch block log.printStackTrace(e); } } return
+	 * outExtractList; }
 	 */
-	public String getExtractClobData(BLOB xlsdocument, String sheetname,
-			String type) throws FileNotFoundException {
+	public String getExtractClobData(BLOB xlsdocument, String sheetname, String type) throws FileNotFoundException {
 
 		List outExtractList = new LinkedList();
 		InputStream clobOutputStream = null;
@@ -2377,8 +2509,7 @@ public String createFile(String filename,String extension,String data){
 		long cloblength = 0;
 		long position;
 		String filename, calculsheetfolder, form2sheetfolder;
-		ResourceBundle bundle = ResourceBundle
-				.getBundle("aims.resource.ApplicationResouces");
+		ResourceBundle bundle = ResourceBundle.getBundle("aims.resource.ApplicationResouces");
 		calculsheetfolder = bundle.getString("upload.folder.path.epf.cal");
 		form2sheetfolder = bundle.getString("upload.folder.path.epf.form2");
 		BufferedWriter fstream = null;
@@ -2399,15 +2530,13 @@ public String createFile(String filename,String extension,String data){
 
 			fstream = new BufferedWriter(new FileWriter(filename));
 			/*
-			 * for ( position = 1; position <= cloblength; position +=
-			 * bufferSize) { // After reading a buffer from the text file, write
-			 * the contents // of the buffer to the output stream using the
-			 * write() // method.
+			 * for ( position = 1; position <= cloblength; position += bufferSize) { //
+			 * After reading a buffer from the text file, write the contents // of the
+			 * buffer to the output stream using the write() // method.
 			 * System.out.println(byteBuffer+"======="+bufferSize); bytesRead =
 			 * xlsdocument.getChars(position,bufferSize,byteBuffer);
-			 * fstream.write(bytesRead); totBytesRead += bytesRead;
-			 * totBytesWritten += bytesRead;
-			 *  }
+			 * fstream.write(bytesRead); totBytesRead += bytesRead; totBytesWritten +=
+			 * bytesRead; }
 			 */
 
 			while ((bytesRead = clobOutputStream.read(byteBuffer)) != -1) {
@@ -2442,77 +2571,97 @@ public String createFile(String filename,String extension,String data){
 		return filename;
 	}
 
-	public String getUploadFolderPath(String fileType, String year,
-			String month, ResourceBundle appbundle) {
-		String path = "", form = "", finyear = "",monthYear = "", pathseperator = "", slashsuffix = "";
-		String appfolderPath = appbundle
-				.getString("upload.folder.path.epf.monthlyrecoveries");
+	public String getUploadFolderPath(String fileType, String year, String month, ResourceBundle appbundle) {
+
+		String path = "", form = "", finyear = "", monthYear = "", pathseperator = "", slashsuffix = "";
+		String appfolderPath = appbundle.getString("upload.folder.path.epf.monthlyrecoveries");
 		pathseperator = appbundle.getString("upload.folder.path.seperator");
 		slashsuffix = appbundle.getString("upload.folder.path.slashsuffix");
 
 		if (fileType.equals("AAIEPF-3")) {
+
+			log.info("=====form - 3");
 			form = "Form-3";
 
 		} else if (fileType.equals("AAIEPF-3A")) {
+			log.info("=====form - 3 (Arrear)");
 			form = "Form-3(Arrear)";
 
 		} else if (fileType.equals("AAIEPF-3-SUPPL")) {
+			log.info("=====form - 3 (Suppl)");
 			form = "Form-3(Suppl)";
 		} else if (fileType.equals("AAIEPF-4")) {
+			log.info("=====form - 4");
 			form = "Form-4";
 		} else if (fileType.equals("AAIEPF-8")) {
+			log.info("=====form - 8");
 			form = "Form-8";
 		}
 		if (fileType.equals("ARREARBREAKUP_UPLOAD")) {
+			log.info("=====ARREARBREAKUP_UPLOAD");
 			form = "ARREARBREAKUP_UPLOAD";
 		} else if (fileType.toLowerCase().equals("other")) {
+			log.info("=====Other");
 			form = "Other";
 		}
-		if (fileType.equals("ARREARBREAKUP_UPLOAD")
-				|| fileType.toLowerCase().equals("other")) {
+
+		if (fileType.equals("ARREARBREAKUP_UPLOAD") || fileType.toLowerCase().equals("other")) {
 			String folderpath = appbundle.getString("upload.folder.path");
 			path = folderpath + slashsuffix + form;
+			log.info(" == ARREARBREAKUP_UPLOAD or  other =" + path);
 		}
 
-		if (fileType.equals("AAIEPF-3") || fileType.equals("AAIEPF-3A")
-				|| fileType.equals("AAIEPF-3-SUPPL")
+		if (fileType.equals("AAIEPF-3") || fileType.equals("AAIEPF-3A") || fileType.equals("AAIEPF-3-SUPPL")
 				|| fileType.equals("AAIEPF-4") || fileType.equals("AAIEPF-8")) {
 			if (Integer.parseInt(month) > 03) {
 				finyear = year + pathseperator + (Integer.parseInt(year) + 1);
 			} else {
 				finyear = (Integer.parseInt(year) - 1) + pathseperator + year;
 			}
-			log.info("month"+month);
-			if(month.equals("01")){
-				monthYear="Jan";
-			}if(month.equals("02")){
-				monthYear="Feb";
-			}if(month.equals("03")){
-				monthYear="Marn";
-			}if(month.equals("04")){
-				monthYear="Apr";
-			}if(month.equals("05")){
-				monthYear="May";
-			}if(month.equals("06")){
-				monthYear="Jun";
-			}if(month.equals("07")){
-				monthYear="Jul";
-			}if(month.equals("08")){
-				monthYear="Aug";
-			}if(month.equals("09")){
-				monthYear="Sep";
-			}if(month.equals("10")){
-				monthYear="Oct";
-			}if(month.equals("11")){
-				monthYear="Nov";
-			}if(month.equals("12")){
-				monthYear="Dec";
+			log.info("month  ==   " + month);
+			if (month.equals("01")) {
+				monthYear = "Jan";
 			}
-			log.info("monthYear"+monthYear);
-			path = appfolderPath + slashsuffix + finyear+ slashsuffix + monthYear + slashsuffix + form;
+			if (month.equals("02")) {
+				monthYear = "Feb";
+			}
+			if (month.equals("03")) {
+				monthYear = "Marn";
+			}
+			if (month.equals("04")) {
+				monthYear = "Apr";
+			}
+			if (month.equals("05")) {
+				monthYear = "May";
+			}
+			if (month.equals("06")) {
+				monthYear = "Jun";
+			}
+			if (month.equals("07")) {
+				monthYear = "Jul";
+			}
+			if (month.equals("08")) {
+				monthYear = "Aug";
+			}
+			if (month.equals("09")) {
+				monthYear = "Sep";
+			}
+			if (month.equals("10")) {
+				monthYear = "Oct";
+			}
+			if (month.equals("11")) {
+				monthYear = "Nov";
+			}
+			if (month.equals("12")) {
+				monthYear = "Dec";
+			}
+			log.info("monthYear==" + monthYear);
+			path = appfolderPath + slashsuffix + finyear + slashsuffix + monthYear + slashsuffix + form;
+			log.info("Path ====> " + path);
 		}
 
 		File filePath = new File(path);
+
 		if (!filePath.exists()) {
 			File saveDir = new File(path);
 			if (!saveDir.exists())
@@ -2531,41 +2680,42 @@ public String createFile(String filename,String extension,String data){
 			outputFileOutputStream = new FileOutputStream(outputBinaryFile1);
 			outputFileOutputStream.write(image.getImageData());
 			outputFileOutputStream.close();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			log.printStackTrace(e);
 		}
 
 	}
-	public String getImageFromDB(String imagepath,String name,String filenames) {
-		String xlspath="",tempPath,imagepaths="";
-		tempPath=imagepath.substring(0,imagepath.lastIndexOf("."));
-		imagepaths=imagepath.substring(0,imagepath.lastIndexOf("."))+".png";
-		filenames=filenames.substring(0,filenames.lastIndexOf("."))+".xls";
-		xlspath=tempPath+".xls";
-		log.info("getImageFromDB"+xlspath+"tempPath==========="+tempPath+"=========name========="+name);
-		
+
+	public String getImageFromDB(String imagepath, String name, String filenames) {
+		String xlspath = "", tempPath, imagepaths = "";
+		tempPath = imagepath.substring(0, imagepath.lastIndexOf("."));
+		imagepaths = imagepath.substring(0, imagepath.lastIndexOf(".")) + ".png";
+		filenames = filenames.substring(0, filenames.lastIndexOf(".")) + ".xls";
+		xlspath = tempPath + ".xls";
+		log.info("getImageFromDB" + xlspath + "tempPath===========" + tempPath + "=========name=========" + name);
+
 		try {
-			WritableWorkbook workbook=Workbook.createWorkbook(new File(xlspath));
-			WritableSheet sheet=workbook.createSheet(name, 0);
-			/* Convert images file into byte array and passed into writable image*/
+			WritableWorkbook workbook = Workbook.createWorkbook(new File(xlspath));
+			WritableSheet sheet = workbook.createSheet(name, 0);
+			/* Convert images file into byte array and passed into writable image */
 			File file = new File(imagepath);
 			FileInputStream fis = new FileInputStream(file);
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	        byte[] buf = new byte[1024];
-	        for (int readNum; (readNum = fis.read(buf)) != -1;) {
-                bos.write(buf, 0, readNum); 
-                //no doubt here is 0
-                /*Writes len bytes from the specified byte array starting at offset 
-                off to this byte array output stream.*/
-                System.out.println("read " + readNum + " bytes,");
-            }
+			byte[] buf = new byte[1024];
+			for (int readNum; (readNum = fis.read(buf)) != -1;) {
+				bos.write(buf, 0, readNum);
+				// no doubt here is 0
+				/*
+				 * Writes len bytes from the specified byte array starting at offset off to this
+				 * byte array output stream.
+				 */
+				System.out.println("read " + readNum + " bytes,");
+			}
 
+			WritableImage imgobj = new WritableImage(5, 7, 9, 60, bos.toByteArray());
 
-			WritableImage imgobj=new WritableImage(5, 7, 9, 60, bos.toByteArray());
-	
-			
 			sheet.addImage(imgobj);
 			sheet.setName(name);
 			sheet.setProtected(true);
@@ -2581,10 +2731,12 @@ public String createFile(String filename,String extension,String data){
 		}
 		return filenames;
 	}
-//	By Prasad on 04-Apr-2012  
-//	By Prasad on 06-Dec-2011 for handling validations on Excel Sheet
-//	By Prasad on 05-Dec-2011 for handling exceptions from form2 & form 3 seperately
-	private String readForm2Data(Sheet s) throws BiffException, InvalidDataException { 
+
+	// By Prasad on 04-Apr-2012
+	// By Prasad on 06-Dec-2011 for handling validations on Excel Sheet
+	// By Prasad on 05-Dec-2011 for handling exceptions from form2 & form 3
+	// seperately
+	private String readForm2Data(Sheet s) throws BiffException, InvalidDataException {
 		log.info("CommonUtil:readForm2Data Entering method");
 		Cell cell = null;
 		StringBuffer eachRow = new StringBuffer();
@@ -2594,69 +2746,73 @@ public String createFile(String filename,String extension,String data){
 		for (int j = 10; j < s.getRows(); j++) {
 			for (int i = 0; i < s.getColumns(); i++) {
 				cell = s.getCell(i, j);
-				if(s.getCell(1,j).getContents().equals("")){
-					if(!s.getCell(8,j).getContents().equals("")||!s.getCell(19,j).getContents().equals("")||!s.getCell(23,j).getContents().equals("")){
+				if (s.getCell(1, j).getContents().equals("")) {
+					if (!s.getCell(8, j).getContents().equals("") || !s.getCell(19, j).getContents().equals("")
+							|| !s.getCell(23, j).getContents().equals("")) {
 						try {
-							throw new InvalidDataException("Sorry....! PFID field cannot be empty. Please Enter the Valid PFID in the Column Number");
+							throw new InvalidDataException(
+									"Sorry....! PFID field cannot be empty. Please Enter the Valid PFID in the Column Number");
 						} catch (InvalidDataException e) {
 							// TODO Auto-generated catch block
 							throw e;
 						}
-						/*if(j+1 < s.getRows()){
-							try {
-								throw new InvalidDataException("Sheet contain blank rows in between the Data in Row: "+(j-1)+" and " +(j+1));
-							} catch (InvalidDataException e) {
-								// TODO Auto-generated catch block
-								throw e;
+						/*
+						 * if(j+1 < s.getRows()){ try { throw new
+						 * InvalidDataException("Sheet contain blank rows in between the Data in Row: "+
+						 * (j-1)+" and " +(j+1)); } catch (InvalidDataException e) { // TODO
+						 * Auto-generated catch block throw e; } }
+						 */
+
+					}
+					log.info("Row :" + j + " have Nodata");
+				} else {
+					if (cell.getType() == CellType.NUMBER_FORMULA) {
+						FormulaCell numberFormulaCell = (FormulaCell) cell;
+
+						try {
+							throw new InvalidDataException(
+									"The formula '" + numberFormulaCell.getFormula() + "' is available in row "
+											+ ((cell.getRow()) + 1) + " and column " + (cell.getColumn()));
+						} catch (FormulaException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InvalidDataException e) {
+							// TODO Auto-generated catch block
+							throw e;
+						}
+					}
+
+					if (!cell.getContents().trim().equals("")) {
+						cellContent = StringUtility
+								.replace(cell.getContents().toCharArray(), delimiter.toCharArray(), "").toString();
+
+						// new code added for invalid data,i.e,validation for special characters
+						if (cell.getType() == CellType.NUMBER) {
+							if (cellContent.indexOf("(") != -1 || cellContent.indexOf(")") != -1
+									|| cellContent.indexOf("}") != -1 || cellContent.indexOf("{") != -1
+									|| cellContent.indexOf("*") != -1) {
+
+								try {
+									throw new InvalidDataException(
+											"The invalid data '" + cell.getContents() + "' exist in Row: "
+													+ (cell.getRow() + 1) + " and Column: " + (cell.getColumn() + 1));
+
+								} catch (InvalidDataException e) {
+									// TODO Auto-generated catch block
+									throw e;
+								}
 							}
-						}*/
-					
-					}
-					log.info("Row :"+j+" have Nodata");
-				}else{
-				if(cell.getType()==CellType.NUMBER_FORMULA){
-					FormulaCell numberFormulaCell = (FormulaCell)cell;
-					
-					try {
-						throw new InvalidDataException("The formula '"+numberFormulaCell.getFormula()+"' is available in row "+((cell.getRow())+1)+" and column "+(cell.getColumn()));
-					} catch (FormulaException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InvalidDataException e) {
-						// TODO Auto-generated catch block
-						throw e;
-					}
-				}
-				 
-				if (!cell.getContents().trim().equals("")) {
-					cellContent = StringUtility.replace(
-							cell.getContents().toCharArray(),
-							delimiter.toCharArray(), "").toString();
-					
-					//	new code added  for invalid data,i.e,validation for special characters
-					if(cell.getType()==CellType.NUMBER){
-					if(cellContent.indexOf("(")!=-1 || cellContent.indexOf(")")!=-1 ||cellContent.indexOf("}")!=-1 || cellContent.indexOf("{")!=-1 || cellContent.indexOf("*")!=-1){
-						
-						try {
-							throw new InvalidDataException("The invalid data '"+cell.getContents()+"' exist in Row: "+(cell.getRow()+1)+" and Column: "+(cell.getColumn()+1));
-						
-						} catch (InvalidDataException e) {
-							// TODO Auto-generated catch block
-							throw e;
 						}
-					}
-					}
-					
-					
-					if (!cellContent.trim().equals("")) {
-						eachRow.append(cell.getContents() + "@");
+
+						if (!cellContent.trim().equals("")) {
+							eachRow.append(cell.getContents() + "@");
+						} else {
+							eachRow.append("XXX" + "@");
+						}
+
 					} else {
 						eachRow.append("XXX" + "@");
 					}
-
-				} else {
-					eachRow.append("XXX" + "@");
-				}
 				}
 
 			}
@@ -2666,6 +2822,7 @@ public String createFile(String filename,String extension,String data){
 		log.info("CommonUtil:readForm2Data Leaving method");
 		return eachRow.toString();
 	}
+
 	public boolean compareTwoDates1(String date1, String date2) {
 		Date compareWthDt = new Date();
 		Date comparedDt = new Date();
@@ -2683,26 +2840,28 @@ public String createFile(String filename,String extension,String data){
 
 		return finalDateFlag;
 	}
-	public String getFinalSettlemetDate( String pfid){
+
+	public String getFinalSettlemetDate(String pfid) {
 		Connection con = null;
 		Statement st = null;
-		String  stdtList ="";
+		String stdtList = "";
 		ResultSet rs = null;
-		String finyear = "",pensionno="";
+		String finyear = "", pensionno = "";
 		try {
 			con = commonDB.getConnection();
 			st = con.createStatement();
-			String query = "SELECT FINYEAR   FROM employee_resettlement_dtl where pensionno='"+pfid+"' order by FINYEAR";
+			String query = "SELECT FINYEAR   FROM employee_resettlement_dtl where pensionno='" + pfid
+					+ "' order by FINYEAR";
 			log.info("getusername==query===========" + query);
 			rs = st.executeQuery(query);
-			while (rs.next()) {			
+			while (rs.next()) {
 				if (rs.getString("FINYEAR") != null) {
 					finyear = rs.getString("FINYEAR").trim();
-					
+
 				} else {
-					
-				}				
-				stdtList+=","+finyear;
+
+				}
+				stdtList += "," + finyear;
 
 			}
 
@@ -2714,7 +2873,8 @@ public String createFile(String filename,String extension,String data){
 		return stdtList;
 
 	}
-public long getDateDifferenceDays(String date1, String date2) {
+
+	public long getDateDifferenceDays(String date1, String date2) {
 		long noOfDays = 0;
 		int days = 0;
 		Date validatDt1 = new Date();
@@ -2725,14 +2885,14 @@ public long getDateDifferenceDays(String date1, String date2) {
 			validatDt2 = sdf.parse(date2);
 			noOfDays = (validatDt2.getTime() - validatDt1.getTime());
 			noOfDays = (noOfDays / (1000L * 60L * 60L * 24L));
-			log.info("--" + validatDt2.getTime() + "--" + validatDt1.getTime()
-					+ "--" + noOfDays);
+			log.info("--" + validatDt2.getTime() + "--" + validatDt1.getTime() + "--" + noOfDays);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		return noOfDays;
-	}	
-public String  getRAUAirports(String region) {
+	}
+
+	public String getRAUAirports(String region) {
 		Connection con = null;
 		ArrayList airportList = new ArrayList();
 
@@ -2742,19 +2902,20 @@ public String  getRAUAirports(String region) {
 		try {
 			con = commonDB.getConnection();
 			Statement st = con.createStatement();
-			String sql = "select unitname from employee_unit_master where upper(region)  ='"+ region + "' and accounttype='RAU' order by unitname";
+			String sql = "select unitname from employee_unit_master where upper(region)  ='" + region
+					+ "' and accounttype='RAU' order by unitname";
 			rs = st.executeQuery(sql);
-			while (rs.next()) {				 
-				if(rs.getString("unitname")!=null){
-				unitName = (String) rs.getString("unitname").toString().trim();
-				stations.append(unitName);
-				stations.append("','");	
-				}else{
-					stations.append("");	
+			while (rs.next()) {
+				if (rs.getString("unitname") != null) {
+					unitName = (String) rs.getString("unitname").toString().trim();
+					stations.append(unitName);
+					stations.append("','");
+				} else {
+					stations.append("");
 				}
 			}
 			airportList.add(stations);
-			//log.info("=====stations========"+stations.toString());
+			// log.info("=====stations========"+stations.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info("error" + e.getMessage());
@@ -2764,6 +2925,6 @@ public String  getRAUAirports(String region) {
 
 	}
 	
-
 	
+
 }

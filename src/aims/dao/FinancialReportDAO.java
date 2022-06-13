@@ -26154,6 +26154,7 @@ if(Integer.parseInt(findFromYear)>=2015) {
 				query.append(whereClause.toString());
 				query.append(orderBy);
 				dynamicQuery = query.toString();
+				System.out.println("Aims / Report /Dao /Financial Report Dao  " );
 				log.info("dynamicQuery:::::::"+dynamicQuery);
 
 		try {

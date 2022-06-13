@@ -778,7 +778,7 @@ public class PensionValidationServlet extends HttpServlet{
 			.getRequestDispatcher("./PensionView/FinanceReportMissingMonths.jsp");
 			rd.forward(request, response);
 		}else if(request.getParameter("method").equals("loadimportedprocess")){
-			log.info("Loading Imported Process");
+			log.info("Loading Imported Process - 1");
 		//	HashMap regionHashmap = new HashMap();
         //    regionHashmap = commonUtil.getRegionsForComparativeReport();
          //   request.setAttribute("regionHashmap",regionHashmap);
@@ -792,7 +792,8 @@ public class PensionValidationServlet extends HttpServlet{
             if(session.getAttribute("region")!=null){
                 regionLst=(String[])session.getAttribute("region");
             }
-            log.info("Regions List"+regionLst.length);
+            log.info("Regions List ==="+regionLst.length);
+            
             for(int i=0;i<regionLst.length;i++){
                 rgnName=regionLst[i];
                 if(rgnName.equals("ALL-REGIONS")&& session.getAttribute("usertype").toString().equals("Admin")){
@@ -815,10 +816,11 @@ public class PensionValidationServlet extends HttpServlet{
 			request.setAttribute("monthIterator", monthIterator);
             request.setAttribute("regionHashmap", map);
             request.setAttribute("formsListMap", formsListMap);
+            log.info("ready for Request ====");
 			RequestDispatcher rd = request.getRequestDispatcher("./PensionView/PensionImportData.jsp");
 			rd.forward(request, response);
 		}else if(request.getParameter("method").equals("loadimportedprocessnavayuga")){
-			log.info("Loading Imported Process");
+			log.info("Loading Imported Process - 2");
 	            String[]regionLst=null;
 	            String rgnName="";
 	            HashMap map=new HashMap();
@@ -852,7 +854,7 @@ public class PensionValidationServlet extends HttpServlet{
 				RequestDispatcher rd = request.getRequestDispatcher("./PensionView/PensionImportDataNavayuga.jsp");
 				rd.forward(request, response);
 			}else if(request.getParameter("method").equals("loadexportProcess")){
-			log.info("Loading Imported Process");
+			log.info("Loading Imported Process - 3");
 			//	HashMap regionHashmap = new HashMap();
 	        //    regionHashmap = commonUtil.getRegionsForComparativeReport();
 	         //   request.setAttribute("regionHashmap",regionHashmap);
@@ -980,7 +982,7 @@ public class PensionValidationServlet extends HttpServlet{
 				rd.forward(request, response);
 			}
 		}else if(request.getParameter("method").equals("loadimportedDeviationProcess")){
-			log.info("Loading Imported Process");
+			log.info("Loading Imported Process - 4");
 			//	HashMap regionHashmap = new HashMap();
 	        //    regionHashmap = commonUtil.getRegionsForComparativeReport();
 	         //   request.setAttribute("regionHashmap",regionHashmap);
@@ -1523,6 +1525,7 @@ public class PensionValidationServlet extends HttpServlet{
 			response.setContentType("text/xml");
 			PrintWriter out = response.getWriter();
 			out.write(sb.toString());
+			log.info("function close ===== " + sb.toString());
 		}
 	}
 	public EmployeeValidateInfo getFinancialLoadEditDetails(String cpfaccno,String unitCode,String effectiveDate){

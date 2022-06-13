@@ -6,7 +6,7 @@
 
 
 <%String contentType = request.getContentType();
-			System.out.println("Content type is :: " + contentType);
+			System.out.println("Content type is :: ====" + contentType);
 			String saveFile = "", dir = "", file = "", filePath = "";
 			int start = 0, end = 0;
 		
@@ -17,6 +17,8 @@
 			ResourceBundle bundle = ResourceBundle
 					.getBundle("aims.resource.DbProperties");
 			String folderPath = bundle.getString("upload.folder.path");
+			
+			System.out.println("PensionFileUpload1 jsp : folder Path1 "+ folderPath);
 			if ((contentType != null)
 					&& (contentType.indexOf("multipart/form-data") >= 0)) {
 				DataInputStream in = new DataInputStream(request
@@ -51,7 +53,7 @@
 		saveFile = saveFile.substring(0, saveFile.indexOf("\n"));
 		saveFile = saveFile.substring(saveFile.lastIndexOf("\\") + 1,
 		saveFile.indexOf("\""));
-		System.out.println("File Name"+saveFile);
+		System.out.println("File Name ========="+saveFile);
 		int lastIndex = contentType.lastIndexOf("=");
 		String boundary = contentType.substring(lastIndex + 1,
 		contentType.length());

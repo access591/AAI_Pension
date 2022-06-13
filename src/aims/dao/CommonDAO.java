@@ -7,13 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.StringTokenizer;
-
+import java.util.TimeZone;
 
 import aims.bean.DesignationBean;
 import aims.bean.EmpMasterBean;
@@ -3261,6 +3263,8 @@ public class CommonDAO {
 			empPenDt = Date.parse(monthYear);
 
 			if (empPenDt >= beginDate && empPenDt <= endDate) {
+				
+				log.info("if block : 1");
 				// log.info("beginDate"+beginDate+"endDate"+endDate+"empPenDt"+
 				// empPenDt);
 				if (Double.parseDouble(emoluments) >= 5000) {
@@ -3272,6 +3276,7 @@ public class CommonDAO {
 						.doubleValue() * 2;
 
 			} else if (empPenDt >= secBeginDate && empPenDt <= secEndDate) {
+				log.info("if block : 2");
 				if (!penionOption.equals("---")) {
 					if (penionOption.trim().equals("A")) {
 						penContrVal = new Double(df.format((Double
@@ -3337,6 +3342,7 @@ public class CommonDAO {
 					}
 				}
 			} else if (monthYear.toLowerCase().equals(chkDecMnth)) {
+				log.info("if block : 3");
 				double salary = 0, perDaySal = 0, firstHalfMnthAmt = 0, secHalfMnthAmt = 0;
 
 				if (penionOption.trim().equals("B")
@@ -3368,7 +3374,7 @@ public class CommonDAO {
 						+ secHalfMnthAmt)).doubleValue();
 
 			}
-			log.info(monthYear + "====" + emoluments + "penContrVal" + penContrVal
+			log.info("*******************" + monthYear + "====" + emoluments + " : penContrVal : " + penContrVal
 					+ "penionOption" + penionOption);
 			return penContrVal;
 		}
@@ -3404,7 +3410,18 @@ public class CommonDAO {
 		}
 		public double calclatedPF(String monthYear, String dateOfRetriment,
 				String dateOfBirth, String calEmoluments, String wetherOption,
-				String region, String days1, String emolumentMonths) {
+				String region, String days1, String emolumentMonths) throws NumberFormatException, ParseException {
+			
+			log.info("monthyear====="+monthYear);
+			log.info("dateOfRetriment====="+dateOfRetriment);
+			log.info("dateOfBirth====="+dateOfBirth);
+			log.info("calEmoluments====="+calEmoluments);
+			log.info("wetherOption====="+wetherOption);
+			log.info("region====="+region);
+			log.info("days1====="+days1);
+			log.info("emolumentMonths====="+emolumentMonths);
+			
+			
 			long transMntYear = 0, empRetriedDt = 0;
 			boolean flag = true, contrFlag = false, chkDOBFlag = false;
 			double pensionVal = 0.00;
@@ -3416,7 +3433,13 @@ public class CommonDAO {
 			if (flag == true) {
 				if (!monthYear.equals("-NA-") && !dateOfRetriment.equals("")) {
 					transMntYear = Date.parse(monthYear);
-					empRetriedDt = Date.parse(dateOfRetriment);
+					
+					//SimpleDateFormat s = new SimpleDateFormat("dd-MMM-yyyy");
+					SimpleDateFormat s = new SimpleDateFormat("ddMMyy");
+					Date d = s.parse(dateOfRetriment);
+					empRetriedDt = d.getTime();
+					
+					log.info("*********************************************");
 
 					log.info("days " + days1);
 

@@ -90,7 +90,7 @@
 				",").toString();
 
 		if (cpfacno.indexOf(",=") != -1) {
-			cpfacno = cpfacno.substring(1, cpfacno.indexOf(",="));
+			cpfacno = cpfacno.substring(0, cpfacno.indexOf(",="));
 		} else if (cpfacno.indexOf(",") != -1) {
 			cpfacno = cpfacno.substring(cpfacno.indexOf(",") + 1,
 					cpfacno.length());

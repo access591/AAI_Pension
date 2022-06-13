@@ -4909,6 +4909,8 @@ public class SearchServlet extends HttpServlet {
 						.getString("upload.folder.path.pfidFiles");
 
 				File filePath1 = new File(folderPath);
+				log.info("=======folder path " + filePath1.getAbsolutePath());
+				System.out.println("=======folder path " + filePath1.getAbsolutePath());
 				if (!filePath1.exists()) {
 					filePath1.mkdirs();
 				}
@@ -5132,6 +5134,8 @@ public class SearchServlet extends HttpServlet {
 							.getString("upload.folder.path.pfidFiles");
 
 					File filePath1 = new File(folderPath);
+					log.info("========folder path -2 " + filePath1.getAbsolutePath());
+					System.out.println("=======folder path -2" + filePath1.getAbsolutePath());
 					if (!filePath1.exists()) {
 						filePath1.mkdirs();
 					}
